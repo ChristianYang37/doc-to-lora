@@ -1,10 +1,17 @@
+import json
+import os
+
 IGNORE_INDEX = -100
+CTX_MARKER = "<ctx_to_lora_context_marker>"
 
 TRANSFORMED_DATA_DIR = "data/processed_datasets"
 RAW_DATA_DIR = "data/raw_datasets/"
 SELF_GEN_DATA_DIR = f"{RAW_DATA_DIR}/self_gen/"
 
 # for chunking
+QWEN3_5_9B_MODEL_ID = "Qwen/Qwen3.5-9B"
+GEMMA4_MODEL_ID = "google/gemma-4-E4B-it"
+
 CTX_AFFIXES = {
     "google/gemma-2-2b-it": {
         "prefix": [2, 106, 1645, 110],  # <bos><start_of_turn>user\n\n\n
@@ -21,6 +28,231 @@ CTX_AFFIXES = {
         "suffix": [151645, 198, 151644, 77091, 198],
     },
 }
+
+CTX_AFFIX_ALIASES = {
+    QWEN3_5_9B_MODEL_ID: "Qwen/Qwen3-4B-Instruct-2507",
+    "Qwen/Qwen3.5-9B-Instruct": "Qwen/Qwen3-4B-Instruct-2507",
+    GEMMA4_MODEL_ID: "google/gemma-2-2b-it",
+    "google/gemma-4-E2B-it": "google/gemma-2-2b-it",
+    "google/gemma-4-31B-it": "google/gemma-2-2b-it",
+}
+
+CHAT_TEMPLATE_ALIASES = {
+    QWEN3_5_9B_MODEL_ID: "Qwen/Qwen3.5-9B",
+    "Qwen/Qwen3.5-9B-Instruct": "Qwen/Qwen3.5-9B",
+    GEMMA4_MODEL_ID: "google/gemma-4-E4B-it",
+    "google/gemma-4-E2B-it": "google/gemma-4-E4B-it",
+    "google/gemma-4-31B-it": "google/gemma-4-E4B-it",
+}
+
+
+def get_model_family_from_config(model_name_or_path: str | None) -> str | None:
+    if model_name_or_path is None:
+        return None
+    config_path = os.path.join(os.path.expanduser(model_name_or_path), "config.json")
+    if not os.path.exists(config_path):
+        return None
+    try:
+        with open(config_path) as f:
+            config = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return None
+
+    text_config = config.get("text_config") or {}
+    model_type = str(config.get("model_type") or text_config.get("model_type") or "")
+    architectures = " ".join(config.get("architectures") or [])
+    if not architectures and text_config:
+        architectures = " ".join(text_config.get("architectures") or [])
+    family_text = f"{model_type} {architectures}".lower()
+
+    if "qwen3_5_moe" in family_text or "qwen3.5moe" in family_text:
+        return "qwen3_5_moe"
+    if "moe" in family_text and (
+        "qwen3_5" in family_text or "qwen3.5" in family_text
+    ):
+        return "qwen3_5_moe"
+    if "qwen3_5" in family_text or "qwen3.5" in family_text:
+        return "qwen3_5"
+    if "qwen" in family_text:
+        return "qwen"
+    if "gemma4" in family_text or "gemma-4" in family_text:
+        return "gemma4"
+    if "gemma" in family_text:
+        return "gemma"
+    return None
+
+
+def get_model_family(model_name_or_path: str | None) -> str | None:
+    if model_name_or_path is None:
+        return None
+    config_family = get_model_family_from_config(model_name_or_path)
+    if config_family is not None:
+        return config_family
+    model_name = model_name_or_path.lower()
+    compact_name = (
+        model_name.replace("-", "")
+        .replace("_", "")
+        .replace(".", "")
+        .replace("/", "")
+    )
+    if (
+        "qwen3.5" in model_name
+        or "qwen3_5" in model_name
+        or "qwen35" in compact_name
+    ):
+        if "moe" in compact_name:
+            return "qwen3_5_moe"
+        return "qwen3_5"
+    if "qwen" in model_name:
+        return "qwen"
+    if "gemma-4" in model_name or "gemma4" in compact_name:
+        return "gemma4"
+    if "gemma" in model_name:
+        return "gemma"
+    return None
+
+
+def get_ctx_affix_key(model_name_or_path: str) -> str:
+    if model_name_or_path in CTX_AFFIXES:
+        return model_name_or_path
+    if model_name_or_path in CTX_AFFIX_ALIASES:
+        return CTX_AFFIX_ALIASES[model_name_or_path]
+
+    family = get_model_family(model_name_or_path)
+    if family == "qwen3_5_moe":
+        raise ValueError(
+            f"{model_name_or_path!r} looks like a Qwen3.5 MoE model, "
+            "but this adapter is configured for the dense Qwen3.5 9B model."
+        )
+    if family in {"qwen", "qwen3_5"}:
+        return "Qwen/Qwen3-4B-Instruct-2507"
+    if family in {"gemma", "gemma4"}:
+        return "google/gemma-2-2b-it"
+
+    supported = sorted(set(CTX_AFFIXES) | set(CTX_AFFIX_ALIASES))
+    raise KeyError(
+        f"No context affix is registered for {model_name_or_path!r}. "
+        f"Supported model keys/families include: {supported}"
+    )
+
+
+def get_ctx_affixes(model_name_or_path: str) -> dict[str, list[int]]:
+    return CTX_AFFIXES[get_ctx_affix_key(model_name_or_path)]
+
+
+def find_subsequence(sequence: list[int], subsequence: list[int]) -> int:
+    if not subsequence:
+        return -1
+    for i in range(len(sequence) - len(subsequence) + 1):
+        if sequence[i : i + len(subsequence)] == subsequence:
+            return i
+    return -1
+
+
+def infer_ctx_affixes_from_tokenizer(tokenizer) -> dict[str, list[int]]:
+    messages = [
+        [
+            {"role": "system", "content": ""},
+            {"role": "user", "content": CTX_MARKER},
+        ]
+    ]
+    tokenized = tokenizer.apply_chat_template(
+        messages,
+        tokenize=True,
+        add_generation_prompt=True,
+        return_attention_mask=False,
+        padding=False,
+        truncation=False,
+        add_special_tokens=False,
+        return_dict=True,
+    )
+    input_ids = tokenized["input_ids"][0]
+    marker_ids = tokenizer(
+        CTX_MARKER,
+        add_special_tokens=False,
+        return_attention_mask=False,
+    )["input_ids"]
+    start = find_subsequence(input_ids, marker_ids)
+    if start >= 0:
+        end = start + len(marker_ids)
+        return {"prefix": input_ids[:start], "suffix": input_ids[end:]}
+
+    rendered = tokenizer.apply_chat_template(
+        messages,
+        tokenize=False,
+        add_generation_prompt=True,
+        add_special_tokens=False,
+    )
+    rendered_text = rendered[0] if isinstance(rendered, list) else rendered
+    marker_start = rendered_text.find(CTX_MARKER)
+    if marker_start < 0:
+        raise ValueError(
+            f"Could not infer context affixes with tokenizer {tokenizer.name_or_path!r}"
+        )
+    marker_end = marker_start + len(CTX_MARKER)
+    return {
+        "prefix": tokenizer(
+            rendered_text[:marker_start],
+            add_special_tokens=False,
+            return_attention_mask=False,
+        )["input_ids"],
+        "suffix": tokenizer(
+            rendered_text[marker_end:],
+            add_special_tokens=False,
+            return_attention_mask=False,
+        )["input_ids"],
+    }
+
+
+def get_ctx_affixes_for_tokenizer(
+    tokenizer,
+    model_name_or_path: str | None = None,
+) -> dict[str, list[int]]:
+    model_name_or_path = model_name_or_path or tokenizer.name_or_path
+    if tokenizer is None:
+        return get_ctx_affixes(model_name_or_path)
+    if model_name_or_path in CTX_AFFIXES:
+        return get_ctx_affixes(model_name_or_path)
+    if tokenizer.chat_template is not None:
+        try:
+            return infer_ctx_affixes_from_tokenizer(tokenizer)
+        except Exception:
+            pass
+    return get_ctx_affixes(model_name_or_path)
+
+
+def get_chat_template_candidates(model_name_or_path: str) -> list[str]:
+    candidates = [model_name_or_path]
+
+    if model_name_or_path in CHAT_TEMPLATE_ALIASES:
+        candidates.append(CHAT_TEMPLATE_ALIASES[model_name_or_path])
+
+    family = get_model_family(model_name_or_path)
+    if family == "qwen3_5_moe":
+        raise ValueError(
+            f"{model_name_or_path!r} looks like a Qwen3.5 MoE model, "
+            "but this adapter is configured for the dense Qwen3.5 9B model."
+        )
+    if family == "qwen3_5":
+        candidates.extend(
+            [
+                "Qwen/Qwen3.5-9B",
+                "Qwen/Qwen3-4B-Instruct-2507",
+            ]
+        )
+    elif family == "qwen":
+        candidates.append("Qwen/Qwen3-4B-Instruct-2507")
+    elif family == "gemma4":
+        candidates.extend(
+            [
+                "google/gemma-4-E4B-it",
+                "google/gemma-2-2b-it",
+            ]
+        )
+    elif family == "gemma":
+        candidates.append("google/gemma-2-2b-it")
+
+    return list(dict.fromkeys(candidates))
 
 
 LONGBENCH_TASKS = [

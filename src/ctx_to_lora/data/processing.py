@@ -16,12 +16,12 @@ from datasets import Dataset, interleave_datasets, is_caching_enabled, load_data
 from transformers import PreTrainedTokenizerBase
 
 from ctx_to_lora.data.definitions import (
-    CTX_AFFIXES,
     DS_KWARGS,
     IGNORE_INDEX,
     RAW_DATA_DIR,
     SELF_GEN_DATA_DIR,
     TRANSFORMED_DATA_DIR,
+    get_ctx_affixes_for_tokenizer,
 )
 from ctx_to_lora.data.packing import pack_batch
 from ctx_to_lora.data.preprocessing_fn import get_preprocessing_fn
@@ -469,6 +469,7 @@ def construct_and_tokenize_ctx_qa(
             "num_chunk_probs": num_chunk_probs,
             "max_num_split": max_ctx_chunk_num,
             "model_name_or_path": tokenizer.name_or_path,
+            "ctx_affixes": get_ctx_affixes_for_tokenizer(tokenizer),
             "is_train": is_train,
         }
         logging.info(f"Chunking context with {split_ctx_kwargs=}")
@@ -678,6 +679,7 @@ def convert_ctx_prompt_response_to_messages(
 def split_too_long_ctx(
     sample: dict[str, Any],
     model_name_or_path: str,
+    ctx_affixes: dict[str, list[int]] | None,
     num_chunk_probs: dict[int, float] | None,
     max_chunk_len: int,
     min_chunk_len: int,
@@ -734,7 +736,7 @@ def split_too_long_ctx(
     avg_len = ceil(len(ctx_ids) / n_chunks)
     chunks = [ctx_ids[i : i + avg_len] for i in range(0, len(ctx_ids), avg_len)]
 
-    ctx_affixes = CTX_AFFIXES[model_name_or_path]
+    ctx_affixes = ctx_affixes or get_ctx_affixes_for_tokenizer(None, model_name_or_path)
     prefix = ctx_affixes["prefix"]
     suffix = ctx_affixes["suffix"]
     # Apply affixes

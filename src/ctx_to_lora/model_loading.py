@@ -6,12 +6,22 @@ from peft import PeftModel
 from peft import get_peft_config as _get_peft_config
 from peft.utils import PeftType
 from transformers import (
+    AutoConfig,
     AutoModel,
     AutoModelForCausalLM,
     AutoTokenizer,
     BitsAndBytesConfig,
     Gemma3ForConditionalGeneration,
 )
+
+try:
+    from transformers import Gemma4ForConditionalGeneration
+except ImportError:
+    Gemma4ForConditionalGeneration = None
+
+from ctx_to_lora.data.definitions import get_chat_template_candidates, get_model_family
+
+QWEN_DISABLE_THINKING = "{%- set enable_thinking = false if enable_thinking is not defined else enable_thinking %}\n"
 
 logger = logging.getLogger()
 
@@ -23,7 +33,43 @@ GEMMA_VISION_MODELS = [
 
 
 def check_is_vision_model(model_name):
-    return model_name in GEMMA_VISION_MODELS
+    if model_name in GEMMA_VISION_MODELS:
+        return True
+    if get_model_family(model_name) != "gemma4":
+        return False
+    try:
+        config = AutoConfig.from_pretrained(model_name, trust_remote_code=True)
+    except Exception:
+        return True
+    return is_conditional_generation_config(config)
+
+
+def resolve_chat_template_path(model_name_or_path):
+    for template_name in get_chat_template_candidates(model_name_or_path):
+        template_path = f"chat_templates/{template_name}.jinja"
+        if os.path.exists(template_path):
+            return template_path
+    return None
+
+
+def is_conditional_generation_config(config) -> bool:
+    architectures = getattr(config, "architectures", None) or []
+    if any("ConditionalGeneration" in arch for arch in architectures):
+        return True
+    return hasattr(config, "text_config") and hasattr(config, "vision_config")
+
+
+def get_conditional_generation_cls(model_name_or_path, config=None):
+    family = get_model_family(model_name_or_path)
+    if family == "gemma4":
+        if config is not None and not is_conditional_generation_config(config):
+            return None
+        if Gemma4ForConditionalGeneration is None:
+            return None
+        return Gemma4ForConditionalGeneration
+    if family == "gemma" and model_name_or_path in GEMMA_VISION_MODELS:
+        return Gemma3ForConditionalGeneration
+    return None
 
 
 def get_model_and_tokenizer(
@@ -78,15 +124,17 @@ def get_tokenizer(
     if tokenizer.pad_token_id is None:
         tokenizer.pad_token_id = tokenizer.eos_token_id
 
-    template_path = f"chat_templates/{model_name_or_path}.jinja"
-    if not os.path.exists(template_path):
+    template_path = resolve_chat_template_path(model_name_or_path)
+    if template_path is None:
         logger.warning(
-            f"Chat template not found at {template_path}. Using default template."
+            f"Chat template not found for {model_name_or_path}. Using default template."
         )
         return tokenizer
 
     logger.info(f"Using chat template from {template_path}")
     chat_template = open(template_path).read()
+    if get_model_family(model_name_or_path) == "qwen3_5":
+        chat_template = QWEN_DISABLE_THINKING + chat_template
     chat_template = chat_template.replace("    ", "").replace("\n", "")
     tokenizer.chat_template = chat_template
     return tokenizer
@@ -111,7 +159,17 @@ def get_model(
         attn_implementation="eager",
         use_cache=None,
     )
-    is_vision_model = check_is_vision_model(model_name_or_path)
+    model_config = None
+    if get_model_family(model_name_or_path) == "gemma4":
+        model_config = AutoConfig.from_pretrained(
+            model_name_or_path,
+            trust_remote_code=True,
+        )
+    conditional_generation_cls = get_conditional_generation_cls(
+        model_name_or_path,
+        config=model_config,
+    )
+    is_vision_model = conditional_generation_cls is not None
     if model_kwargs is not None:
         model_init_kwargs.update(model_kwargs)
 
@@ -154,7 +212,17 @@ def get_model(
         else:
             model = AutoModelForCausalLM.from_pretrained(**model_init_kwargs)
     else:
-        model = Gemma3ForConditionalGeneration.from_pretrained(**model_init_kwargs)
+        if conditional_generation_cls is None:
+            config = model_config or AutoConfig.from_pretrained(
+                model_name_or_path, trust_remote_code=True
+            )
+            raise ImportError(
+                f"{model_name_or_path} has config type {type(config).__name__}, "
+                "but this transformers install does not expose the matching "
+                "conditional generation class. Please upgrade transformers before "
+                "loading this Gemma conditional-generation model."
+            )
+        model = conditional_generation_cls.from_pretrained(**model_init_kwargs)
         model = model.language_model
     if peft_config is not None:
         model = PeftModel(model, peft_config)

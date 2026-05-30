@@ -19,6 +19,8 @@ from safetensors.torch import save_file
 from transformers import AutoModel, AutoModelForCausalLM, AutoTokenizer
 from transformers.models.llama.modeling_llama import LlamaRotaryEmbedding
 
+from ctx_to_lora.model_loading import resolve_chat_template_path
+
 
 def add_full_stop(s):
     s = s.strip()
@@ -156,8 +158,8 @@ def get_tokenizer(model_path, tokenizer_kwargs=None, peft_config=None, train=Fal
     if tokenizer.pad_token_id is None:
         tokenizer.pad_token_id = tokenizer.eos_token_id
 
-    template_path = f"chat_templates/{model_path}.jinja"
-    assert os.path.exists(template_path), (
+    template_path = resolve_chat_template_path(model_path)
+    assert template_path is not None and os.path.exists(template_path), (
         f"Chat template not found for {model_path}.\n"
         "We assume a specfic form of chat template for consistency between models. "
         "Please use the templates provided."

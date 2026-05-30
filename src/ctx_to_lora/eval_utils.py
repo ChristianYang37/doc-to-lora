@@ -26,10 +26,10 @@ from transformers import (
 from ctx_to_lora.data.collator import eval_collator, generation_collator
 from ctx_to_lora.data.definitions import (
     CLOSED_QA_DATASETS,
-    CTX_AFFIXES,
     LONGBENCH_E_TASKS,
     LONGBENCH_TASKS,
     MULTI_ANSWER_DATASETS,
+    get_ctx_affixes_for_tokenizer,
 )
 from ctx_to_lora.data.processing import (
     get_tokenized_dataset,
@@ -497,7 +497,7 @@ def decode_test_result(
 
         gen_toks = pred_toks[np.argmax(pred_toks != tokenizer.pad_token_id) :]
         # gen_toks = gen_toks[start_idx:]
-        suffix = np.array(CTX_AFFIXES[tokenizer.name_or_path]["suffix"])
+        suffix = np.array(get_ctx_affixes_for_tokenizer(tokenizer)["suffix"])
         # iterate over gen_toks and take the answer after the suffix
         for i in range(len(gen_toks) - len(suffix), -1, -1):
             if all(gen_toks[i : i + len(suffix)] == suffix):
@@ -779,7 +779,10 @@ def evaluate(
             )
             ctx_distill_kwargs = dict(
                 prefix_tokens=torch.tensor(
-                    CTX_AFFIXES[model_name_or_path]["prefix"], device=base_model.device
+                    get_ctx_affixes_for_tokenizer(tokenizer, model_name_or_path)[
+                        "prefix"
+                    ],
+                    device=base_model.device,
                 ),
                 ctx_inp_sep_seq=sep_seq,
                 pad_token_id=tokenizer.pad_token_id,
@@ -815,7 +818,10 @@ def evaluate(
             model = TextToLoRA(
                 base_model.name_or_path,
                 prefix_tokens=torch.tensor(
-                    CTX_AFFIXES[model_name_or_path]["prefix"], device=base_model.device
+                    get_ctx_affixes_for_tokenizer(tokenizer, model_name_or_path)[
+                        "prefix"
+                    ],
+                    device=base_model.device,
                 ),
                 device=base_model.device,
             )

@@ -2,7 +2,7 @@ import torch
 from llmlingua import PromptCompressor
 from torch import nn
 
-from ctx_to_lora.data.definitions import CTX_AFFIXES
+from ctx_to_lora.data.definitions import get_ctx_affixes_for_tokenizer
 
 
 class LLMLinguaModel(nn.Module):
@@ -14,8 +14,9 @@ class LLMLinguaModel(nn.Module):
             use_llmlingua2=True,  # Whether to use llmlingua-2
         )
         model_name = self.base_model.name_or_path
-        self.register_buffer("prefix", torch.tensor(CTX_AFFIXES[model_name]["prefix"]))
-        self.register_buffer("suffix", torch.tensor(CTX_AFFIXES[model_name]["suffix"]))
+        ctx_affixes = get_ctx_affixes_for_tokenizer(tokenizer, model_name)
+        self.register_buffer("prefix", torch.tensor(ctx_affixes["prefix"]))
+        self.register_buffer("suffix", torch.tensor(ctx_affixes["suffix"]))
         self.len_prefix = len(self.prefix)
         self.len_suffix = len(self.suffix)
         self.tokenizer = tokenizer
