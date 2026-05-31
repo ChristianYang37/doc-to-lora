@@ -1,0 +1,669 @@
+{
+  "dataset_name": "Yewei-Liu/ms_marco_mqa",
+  "config": null,
+  "split": "train",
+  "success": true,
+  "num_samples": 10,
+  "samples": [
+    {
+      "query_id": 20901,
+      "context": "Herne Bay /hɜrn/ is a seaside town in Kent, South East England, with a population of 38,563. On the south coast of the Thames Estuary it is 7 miles (11 km) north of Canterbury and 5 miles (8 km) east of Whitstable. Herne Bay railway station is on the Chatham Main Line, which runs between Ramsgate in East Kent and London Victoria. Other stations on this line include Broadstairs, Margate, Whitstable, Faversham, Gillingham, Rochester and Bromley South. Herne Bay is around 1 hour and 40 minutes from London\n\nWhitstable and Eastbourne have headed a list of the UK's fastest growing seaside resort destinations, with massive investment and an expansion of high-end tourism cited as major factors in a reversal of fortunes for the UK's seaside destinations. The trend, helped by £100 million worth of public investment in seaside towns, resulted in 21 per cent more UK holidaymakers staying overnight and spending almost a quarter more money at the English coast this year, it said.\n\nRanked by a growth in tourism-related businesses, number of employees and a growth in visitor numbers to tourist attractions, Whitstable, in Kent, and Eastbourne, in East Sussex, with 13.9 per cent and 11 per cent respectively, headed the list. The trend, helped by £100 million worth of public investment in seaside towns, resulted in 21 per cent more UK holidaymakers staying overnight and spending almost a quarter more money at the English coast this year, it said.\n\nWhitstable [1] is a town in Kent, England. Whitstable is located on the North Kent Coast. The town is famous for its Oysters, and has several upmarket fish restaurants. Tourist Information is not currently availiable in whitstable itself, as the centre along the high street has recently closed. Whitstable is served by regular trains from London Victoria, Margate, the Medway Towns and Faversham. Most trains from London Victoria divide at Faversham, with half of the train taking the North coast line, and half heading for the South coast; ensure that you are sitting in the correct part of the train.\n\n© pam fray and licensed for reuse under this Creative Commons Licence. Whitstable's West Beach is a long stretch of shingle divided up by wooden groynes. It runs from just south of the town's harbour to neighbouring Seasalter, a distance of around a mile. Despite the lack of sand Whitstable is still a fantastic spot.\n\nAfter seeing the amazing Shell Grotto on television I had to take a trip to Margate to see it for myself. And nearby is the more upmarket Whitstable, also on the south east coast. Also added are Leeds & Dover Castles as well as the southern coastal city of Portsmouth, plus a couple of weird micronations.. \n\nHerne Bay, along with Whitstable and Canterbury, is in the City of Canterbury local government district. The town contains the five electoral wards of Heron, Herne and Broomfield, Greenhill and Eddington, West Bay and Reculver. These wards have thirteen of the fifty seats on the Canterbury City council. Herne Bay railway station is on the Chatham Main Line, which runs between Ramsgate in East Kent and London Victoria. Other stations on this line include Broadstairs, Margate, Whitstable, Faversham, Gillingham, Rochester and Bromley South. Herne Bay is around 1 hour and 40 minutes from London\n\nThere are a few other places to grab a bite to eat along the beach too, including the Whitstable Oyster Company restaurant if you fancy something a little upmarket. Whitstable beach is popular for windsurfing and sailing, with the Whitstable Yacht Club located at the northern end. To top this all off Whitstable beach faces west meaning it is a great place to catch a sunset. Whitstable's West Beach is a long stretch of shingle divided up by wooden groynes. It runs from just south of the town's harbour to neighbouring Seasalter, a distance of around a mile. Despite the lack of sand Whitstable is still a fantastic spot.",
+      "conversations": [
+        {
+          "question": "What is the population of Herne Bay?",
+          "answer": "38,563"
+        },
+        {
+          "question": "How far is Herne Bay from Canterbury?",
+          "answer": "7 miles (11 km) north of Canterbury"
+        },
+        {
+          "question": "Which railway line does Herne Bay railway station lie on?",
+          "answer": "the Chatham Main Line"
+        },
+        {
+          "question": "What are the two towns that headed the list of the UK's fastest growing seaside resort destinations?",
+          "answer": "Whitstable and Eastbourne"
+        },
+        {
+          "question": "How much public investment was cited as a factor in the growth of UK seaside towns?",
+          "answer": "£100 million worth of public investment"
+        },
+        {
+          "question": "What percentage increase in overnight stays by UK holidaymakers was reported this year?",
+          "answer": "21 per cent more UK holidaymakers staying overnight"
+        },
+        {
+          "question": "Which town is famous for its oysters and has several upmarket fish restaurants?",
+          "answer": "Whitstable"
+        },
+        {
+          "question": "What is the name of the beach in Whitstable that runs from just south of the harbour to Seasalter?",
+          "answer": "Whitstable's West Beach"
+        },
+        {
+          "question": "What is the approximate length of Whitstable's West Beach?",
+          "answer": "a distance of around a mile"
+        },
+        {
+          "question": "Which electoral wards are part of Herne Bay within the City of Canterbury local government district?",
+          "answer": "Heron, Herne and Broomfield, Greenhill and Eddington, West Bay and Reculver"
+        },
+        {
+          "question": "What is the main purpose of the context regarding UK seaside towns?",
+          "answer": "to highlight the resurgence and growth of seaside resorts like Whitstable and Eastbourne due to investment and tourism expansion"
+        },
+        {
+          "question": "What major factor contributed to the reversal of fortunes for UK seaside destinations?",
+          "answer": "massive investment and an expansion of high-end tourism"
+        },
+        {
+          "question": "Why is Whitstable considered a great place to view sunsets?",
+          "answer": "Whitstable beach faces west meaning it is a great place to catch a sunset"
+        },
+        {
+          "question": "What activity is popular at Whitstable beach besides windsurfing and sailing?",
+          "answer": "windsurfing and sailing"
+        },
+        {
+          "question": "Which city is located near Herne Bay and is also mentioned as being in the same local government district?",
+          "answer": "Canterbury"
+        }
+      ]
+    },
+    {
+      "query_id": 19712,
+      "context": "Back to Top How much should a typical radiant system cost? On average, a radiant heating system will typically cost between $6-$12 per square foot to install. The variance in price is mainly affected by the amount of separate zoned areas and the overall size of the system.\n\nA well designed radiant system... will normally cost less than $3 per square foot, and less than $2 for a slab on grade .. Interestingly enough, the site also explains that the larger the home the lower the cost of the equipment, and gives a quote for a five thousand square foot installation at $2 per square foot.\n\n1 Expect to pay about $6-$16 a square foot for a professionally installed hydronic (hot water) radiant floor heating system, or $9,000-$22,500 or more for a 1,500 square foot home, depending on local rates, the number of temperature zones and the overall size of the system.\n\nTypical costs: 1  Expect to pay about $6-$16 a square foot for a professionally installed hydronic (hot water) radiant floor heating system, or $9,000-$22,500 or more for a 1,500 square foot home, depending on local rates, the number of temperature zones and the overall size of the system.\n\nCurrent electric charges in the area are about 15¢ per kWh, natural gas is about $1.40 a ccf, propane is about $3.00 a gallon, and oil is about $3.20 a gallon. The annual cost to heat a 2200 square foot existing house of average energy consumption for different combinations of fuels and furnaces: 1  Natural Gas in an 80% furnace: $1215.\n\nOur free calculator uses recent, trusted data to estimate costs for your Electric Radiant Floor Installation project. For a basic 125 square feet project in zip code 47474, the benchmark cost to Install Radiant Floor Heat ranges between $5.17 - $7.89 per square foot* . To estimate costs for your project: 1. Set Project Zip Code Enter the Zip Code for the location where labor is hired and materials purchased.\n\nOn average the systems cost between $6-$12 per square foot of the conditioned space. In addition, an indirect fired storage option which we install for domestic water heating using the same space heating boiler will run between $4,500.00-$7,000.00.",
+      "conversations": [
+        {
+          "question": "What is the average cost range for installing a radiant heating system per square foot?",
+          "answer": "On average, a radiant heating system will typically cost between $6-$12 per square foot to install."
+        },
+        {
+          "question": "What factor primarily affects the variance in the price of a radiant heating system?",
+          "answer": "The variance in price is mainly affected by the amount of separate zoned areas and the overall size of the system."
+        },
+        {
+          "question": "What is the typical cost for a well-designed radiant system per square foot?",
+          "answer": "A well designed radiant system... will normally cost less than $3 per square foot"
+        },
+        {
+          "question": "How much does a slab on grade radiant system typically cost per square foot?",
+          "answer": "less than $2 for a slab on grade"
+        },
+        {
+          "question": "What is the quoted cost per square foot for a five thousand square foot radiant heating installation?",
+          "answer": "$2 per square foot"
+        },
+        {
+          "question": "What is the cost range per square foot for a professionally installed hydronic radiant floor heating system?",
+          "answer": "about $6-$16 a square foot"
+        },
+        {
+          "question": "What is the estimated cost range for a 1,500 square foot home with a hydronic radiant floor heating system?",
+          "answer": "$9,000-$22,500 or more"
+        },
+        {
+          "question": "What are the current electric charges in the area per kWh?",
+          "answer": "about 15¢ per kWh"
+        },
+        {
+          "question": "What is the cost of natural gas per ccf in the area?",
+          "answer": "$1.40 a ccf"
+        },
+        {
+          "question": "What is the annual cost to heat a 2200 square foot house using natural gas in an 80% furnace?",
+          "answer": "$1215"
+        },
+        {
+          "question": "What is the main purpose of the free calculator mentioned in the context?",
+          "answer": "Our free calculator uses recent, trusted data to estimate costs for your Electric Radiant Floor Installation project."
+        },
+        {
+          "question": "What does the benchmark cost for a basic 125 square feet radiant floor heat installation depend on?",
+          "answer": "To estimate costs for your project: 1. Set Project Zip Code Enter the Zip Code for the location where labor is hired and materials purchased."
+        },
+        {
+          "question": "What is the general trend in cost per square foot as the size of the home increases?",
+          "answer": "the larger the home the lower the cost of the equipment"
+        },
+        {
+          "question": "What additional feature can be installed using the same space heating boiler, and what is its cost range?",
+          "answer": "an indirect fired storage option which we install for domestic water heating using the same space heating boiler will run between $4,500.00-$7,000.00"
+        },
+        {
+          "question": "What is the primary factor influencing the total cost of a radiant floor heating system beyond the base rate per square foot?",
+          "answer": "depending on local rates, the number of temperature zones and the overall size of the system"
+        }
+      ]
+    },
+    {
+      "query_id": 20882,
+      "context": "£4,080. This represents a cost of £68 per square metre, which we consider to be a fair and reasonable price for a new 60 square metre Pattern Imprinted Concrete driveway in one colour and any pattern, and with no major complications.\n\nFor the 30-square metre driveway, the total cost would be $3000-$5000. The driveway could last longer by applying natural stone pavers over a base of concrete. The cost per square metre for buying pavers is $25-$100 and installing them is $65-$100. The total cost would be $4700-$8000 for the 30-square metre driveway. Using the 30-square metre driveway as an example for costs, you might expect to pay: 1  Coloured concrete – About $2300. 2  Spray-painted concrete – Around $2600, with $20 or more per square metre.\n\nAdd your answer. Price per square metre roughly for a concrete imprint driveway... We are going to be getting some quotations for our shared driveway and are going halves with our neighbours. It is roughly 13 metres long by 5 metres wide. This Site Might Help You. RE: Price per square metre roughly for a concrete imprint driveway... We are going to be getting some quotations for our shared driveway and are going halves with our neighbours.\n\nA rough concrete slab will cost much less than a decorative finish. At a rough estimate: 1  Plain concrete can cost between $60 and $85 per square metre, installed. 2  A decorative finish on a driveway starts at about $90 per square metre and goes up to $150 or more. \n\nDepending on which you choose, expect to pay $35-$50 per square metre for a simple pattern and $85-$100 or more for more intricate work. For the driveway in our example above, concrete and stencilling might cost anywhere between a little over $3,000 to as much as $5,000. 1 Coloured concrete might set you back a few hundred dollars more or around $2,300. 2  Spray painting concrete starts at about $20 per square metre. 3  For our 30 square metre driveway, that works out to about $2,600, including the concrete work. 4  Popular exposed aggregate might cost about $3,000 for the same size driveway.\n\n1 Popular exposed aggregate might cost about $3,000 for the same size driveway. 2  Pavers start at about $25 per square metre and go up to $100 or more. 3  Paving installers will charge anywhere between $65 and $100 per square metre for their services. 1 Coloured concrete might set you back a few hundred dollars more or around $2,300. 2  Spray painting concrete starts at about $20 per square metre. 3  For our 30 square metre driveway, that works out to about $2,600, including the concrete work. 4 \n\nCost of asphalting in comparison to cost of concreting represents excellent value for money. Plain grey concrete generally costs between $60 - $65 per square meter. An asphalt driveway with feature edging can be comparative per square meter in price, and the end result is so much more aesthetically pleasing! \n\n1 Spray painting concrete starts at about $20 per square metre. 2  For our 30 square metre driveway, that works out to about $2,600, including the concrete work. 3  Popular exposed aggregate might cost about $3,000 for the same size driveway. 4  Pavers start at about $25 per square metre and go up to $100 or more. 1 Coloured concrete might set you back a few hundred dollars more or around $2,300. 2  Spray painting concrete starts at about $20 per square metre. 3  For our 30 square metre driveway, that works out to about $2,600, including the concrete work. 4",
+      "conversations": [
+        {
+          "question": "What is the total cost for a 60-square metre Pattern Imprinted Concrete driveway?",
+          "answer": "£4,080"
+        },
+        {
+          "question": "What is the cost per square metre for a new 60 square metre Pattern Imprinted Concrete driveway?",
+          "answer": "£68 per square metre"
+        },
+        {
+          "question": "What is the estimated cost range for a 30-square metre driveway using coloured concrete?",
+          "answer": "$2300"
+        },
+        {
+          "question": "What is the cost per square metre for spray-painted concrete?",
+          "answer": "$20 or more per square metre"
+        },
+        {
+          "question": "What is the total cost range for a 30-square metre driveway with natural stone pavers over a concrete base?",
+          "answer": "$4700-$8000"
+        },
+        {
+          "question": "What is the cost range per square metre for buying natural stone pavers?",
+          "answer": "$25-$100"
+        },
+        {
+          "question": "What is the cost range per square metre for installing natural stone pavers?",
+          "answer": "$65-$100"
+        },
+        {
+          "question": "What is the approximate cost of a popular exposed aggregate driveway for a 30-square metre area?",
+          "answer": "$3,000"
+        },
+        {
+          "question": "What is the price range for plain concrete installation per square metre?",
+          "answer": "$60 - $85 per square metre"
+        },
+        {
+          "question": "What is the price range for a decorative finish on a driveway per square metre?",
+          "answer": "$90 per square metre and goes up to $150 or more"
+        },
+        {
+          "question": "What is the main purpose of the context provided?",
+          "answer": "To provide cost estimates and comparisons for different types of driveways, including concrete imprints, pavers, and asphalt, based on size and finish"
+        },
+        {
+          "question": "What is the primary comparison being made between asphalting and concreting in the context?",
+          "answer": "Cost of asphalting in comparison to cost of concreting represents excellent value for money"
+        },
+        {
+          "question": "What does the context suggest about the aesthetic appeal of an asphalt driveway compared to concrete?",
+          "answer": "The end result is so much more aesthetically pleasing!"
+        },
+        {
+          "question": "What is the general conclusion regarding the cost of decorative finishes versus plain concrete?",
+          "answer": "A decorative finish on a driveway starts at about $90 per square metre and goes up to $150 or more"
+        },
+        {
+          "question": "How does the context describe the cost difference between simple and intricate pattern imprints?",
+          "answer": "Expect to pay $35-$50 per square metre for a simple pattern and $85-$100 or more for more intricate work"
+        }
+      ]
+    },
+    {
+      "query_id": 20221,
+      "context": "The average time for a piercing to heal is 6 weeks but it can take a little longer for some…. wait another week or so and if it still hurts or there is blood than i say you go to the place you got it done and ask them why it is doing this, maybe they can give you something to quicken the healing process!\n\nHow long does it take to heal a lip piercing? So long as the lip piercing is performed correctly and proper aftercare is followed and no infection or other hindrance in the healing process occur, most lip piercings require a minimum of six to eight weeks to heal.\n\nNo piercing is considered fully healed until it's a year old. Contrary to what you may read, it takes the body a full year to season a piercing to the point where it can be removed for extended periods of time without the risk of the piercing closing.\n\nHealing time is different depending on the part of your body that you get pierced. Some parts are more likely to get infected or have problems. Piercings on your ear lobes usually take about 6-8 weeks to heal. However, piercings on the side of your ear (cartilage) can take anywhere from 4 months to 1 year to heal.\n\nThe healing time of a navel/ belly button piercing can take longer due to the irritation of tight clothing. This can cause an infection. Here is a general guideline for how long it takes for certain body piercings to heal. — Ear lobe piercing takes between six to eight weeks to heal.\n\n1 How long does it take for an ear piercing to heal? ...I got a second ear piercing at claire’s about two months ago. 2  I kept the earring on for 6 weeks and cleaned it with the antiseptic like they said to.\n\nUntil the piercing has healed, taking the earring post out of the hole will only expose your raw tissue to infection. For ear piercings, the healing process typically takes 6-8 weeks. During that time, you must wear the earring you put into your new piercing at all times or risk a painful\n\nAs we have said the time frame for a newly pierced nose to completely heal varies from 2 to 4 months for nostril piercing and 6 to 8 months for septum piercings. Swelling and other symptoms that appear immediately after the piercing is done however normally go away in 10 to 15 days.\n\nKeep the same earring on till it’s completely healed. I have 6 ear piercings n all took different lengths of time to heal. Longest was on the cartilage on the top lobe. About 6 months. My belly ring took over 6 months n my nose ring nearly 1 year. Depends how irritated it gets.",
+      "conversations": [
+        {
+          "question": "How long does it typically take for a lip piercing to heal?",
+          "answer": "most lip piercings require a minimum of six to eight weeks to heal"
+        },
+        {
+          "question": "What is the recommended time frame for an ear lobe piercing to heal?",
+          "answer": "Ear lobe piercing takes between six to eight weeks to heal"
+        },
+        {
+          "question": "How long can cartilage piercings on the side of the ear take to heal?",
+          "answer": "can take anywhere from 4 months to 1 year to heal"
+        },
+        {
+          "question": "What is the healing time for a navel or belly button piercing?",
+          "answer": "The healing time of a navel/ belly button piercing can take longer due to the irritation of tight clothing"
+        },
+        {
+          "question": "How long does it take for a nostril piercing to heal?",
+          "answer": "2 to 4 months for nostril piercing"
+        },
+        {
+          "question": "How long does it take for a septum piercing to heal?",
+          "answer": "6 to 8 months for septum piercings"
+        },
+        {
+          "question": "What should you do if your piercing still hurts or has blood after waiting another week?",
+          "answer": "go to the place you got it done and ask them why it is doing this, maybe they can give you something to quicken the healing process!"
+        },
+        {
+          "question": "Why might a belly button piercing take longer to heal?",
+          "answer": "due to the irritation of tight clothing. This can cause an infection"
+        },
+        {
+          "question": "When is a piercing considered fully healed according to the context?",
+          "answer": "No piercing is considered fully healed until it's a year old"
+        },
+        {
+          "question": "What is the average healing time for a piercing according to the context?",
+          "answer": "The average time for a piercing to heal is 6 weeks but it can take a little longer for some"
+        },
+        {
+          "question": "What is the main purpose of wearing the same earring during the healing process?",
+          "answer": "Until the piercing has healed, taking the earring post out of the hole will only expose your raw tissue to infection"
+        },
+        {
+          "question": "What is the general guideline for how long it takes for ear lobe piercings to heal?",
+          "answer": "Ear lobe piercing takes between six to eight weeks to heal"
+        },
+        {
+          "question": "What happens to swelling and other symptoms after a nose piercing?",
+          "answer": "Swelling and other symptoms that appear immediately after the piercing is done however normally go away in 10 to 15 days"
+        },
+        {
+          "question": "What is the longest healing time mentioned for any piercing in the context?",
+          "answer": "My nose ring nearly 1 year"
+        },
+        {
+          "question": "What is the overall main idea of the context?",
+          "answer": "Healing times for body piercings vary significantly by location, with most taking several weeks to over a year, and proper aftercare is essential to prevent infection and ensure full healing"
+        }
+      ]
+    },
+    {
+      "query_id": 19717,
+      "context": "Today's oilskins (or oilies) typically come in two parts, jackets and trousers. Oilskin jackets are generally similar to common rubberized waterproofs. The chief difference is a high spray collar. Some have hoods, often in a high-visibility colour to increase visibility if a wearer falls overboard. The cuffs of better oilskin jackets include an inner seal at the wrist similar to that on a scuba diver's drysuit to prevent water from being forced up the sleeve. Pockets on trousers and jackets are often lined with quick-drying synthetic fleece that is warm even when soaked.\n\nAn oilskin is a waterproof garment, typically worn by sailors and by others in wet areas, such as fish-plant workers. The cuffs of better oilskin jackets include an inner seal at the wrist similar to that on a scuba diver's drysuit to prevent water from being forced up the sleeve. Pockets on trousers and jackets are often lined with quick-drying synthetic fleece that is warm even when soaked.\n\nNoun. 1. oilskin-a macintosh made from cotton fabric treated with oil and pigment to make it waterproof. slicker. mac, mack, mackintosh, macintosh-a waterproof raincoat made of rubberized fabric. 1. (Textiles). a. a cotton fabric treated with oil and pigment to make it waterproof. b. (as modifier): an oilskin hat. 2. (Clothing & Fashion) (often plural) a protective outer garment of this fabric.\n\nAdorable animal families that will make you aww. Oilskin is fabric that has been impregnated with oil to make it waterproof. Before the development of synthetic fibers, this was the material of choice for waterproof garments and coverings. Sailors, especially, grew familiar with oilskin, since it protected them from the elements on the job. It is still possible to buy oilskin fabric and garments made with it, and people can also make their own. Oils like beeswax make great waterproofers, and they smell pleasant, unlike the tar of old.\n\nn. 1. Cloth treated with oil to make it waterproof. 2. a. A garment made of oilskin or of a synthetic waterproof material, generally used by sailors. 1. (Textiles). a. a cotton fabric treated with oil and pigment to make it waterproof. b. (as modifier): an oilskin hat. 2. (Clothing & Fashion) (often plural) a protective outer garment of this fabric.\n\nAlso known as foul weather gear, contemporary oilskins include such innovations as DWR-coated nylon on their low end and Gore-Tex and other proprietary waterproof membranes on the high. A Sou'wester, a traditional form of collapsible oilskin rain-hat, is longer in the back than the front to fully protect the neck. The cuffs of better oilskin jackets include an inner seal at the wrist similar to that on a scuba diver's drysuit to prevent water from being forced up the sleeve. Pockets on trousers and jackets are often lined with quick-drying synthetic fleece that is warm even when soaked.\n\nFabric is sold by the running yard. If you purchase one yard of oilcloth you will be sent a piece that is 36 by 47. Fabric is sold in 1/4 yard increments, with a 1/2 yard minimum per fabric. Orders under 1/2 yard will automatically be increased to the minimum. If you need a lot of oilcloth you can buy it by the roll for $81.00. Each roll is 12 yards long\n\nTrue to the old adage they get along like oil and water, the reason oilskin works is the oil coating will not let the water pass through the fabric. This is why oilskin works, and is the Natural Waterproof Fabric. Cotton, as a natural fabric, does have a slight nap to it. \n\nOutback Oilskin is produced from 100% Cotton, enabling the fabric to breathe. This property lends the fabric to not only high performance wet weather gear, but stylish casual clothing such as jackets and vests as well. \n\nOilcloth, also known as enameled cloth or (in England) American cloth, was close-woven cotton duck or linen cloth with a coating of boiled linseed oil to make it waterproof.",
+      "conversations": [
+        {
+          "question": "What are the two typical parts of today's oilskins?",
+          "answer": "jackets and trousers"
+        },
+        {
+          "question": "What feature distinguishes oilskin jackets from common rubberized waterproofs?",
+          "answer": "a high spray collar"
+        },
+        {
+          "question": "What material is used to treat cotton fabric to make it waterproof in oilskin?",
+          "answer": "oil and pigment"
+        },
+        {
+          "question": "What type of lining is often used in pockets on oilskin trousers and jackets?",
+          "answer": "quick-drying synthetic fleece"
+        },
+        {
+          "question": "How does the inner seal at the wrist of better oilskin jackets prevent water entry?",
+          "answer": "similar to that on a scuba diver's drysuit to prevent water from being forced up the sleeve"
+        },
+        {
+          "question": "What is another name for contemporary oilskins?",
+          "answer": "foul weather gear"
+        },
+        {
+          "question": "What are some modern materials used in contemporary oilskins, especially on the high end?",
+          "answer": "Gore-Tex and other proprietary waterproof membranes"
+        },
+        {
+          "question": "What is the purpose of the longer back section on a Sou'wester hat?",
+          "answer": "to fully protect the neck"
+        },
+        {
+          "question": "What is the minimum purchase amount for oilcloth fabric?",
+          "answer": "1/2 yard"
+        },
+        {
+          "question": "How much does a 12-yard roll of oilcloth cost?",
+          "answer": "$81.00"
+        },
+        {
+          "question": "What is the reason oilskin works as a waterproof fabric?",
+          "answer": "the oil coating will not let the water pass through the fabric"
+        },
+        {
+          "question": "What natural fabric property allows oilskin to breathe?",
+          "answer": "cotton, as a natural fabric, does have a slight nap to it"
+        },
+        {
+          "question": "What type of cloth was traditionally used to make oilcloth?",
+          "answer": "close-woven cotton duck or linen cloth"
+        },
+        {
+          "question": "What coating was applied to traditional oilcloth to make it waterproof?",
+          "answer": "boiled linseed oil"
+        },
+        {
+          "question": "What is the main purpose of oilskin garments?",
+          "answer": "a protective outer garment of this fabric"
+        }
+      ]
+    },
+    {
+      "query_id": 19836,
+      "context": "Definition. Sed rate, or erythrocyte sedimentation rate (ESR), is a blood test that can reveal inflammatory activity in your body. A sed rate test isn't a stand-alone diagnostic tool, but it may help your doctor diagnose or monitor the progress of an inflammatory disease.\n\nSedimentation Rate (Sed Rate). Guide. The sedimentation rate (sed rate) blood test measures how quickly red blood cells (erythrocytes) settle in a test tube in one hour. The more red cells that fall to the bottom of the test tube in one hour, the higher the sed rate.\n\nThe sed rate test measures the distance red blood cells fall in a test tube in one hour. The farther the red blood cells have descended, the greater the inflammatory response of your immune system.\n\nBlood tests for ESR or Erythrocyte Sedimentation Rate is a measure that is traditionally used to check for inflammation in the body.\n\nA sedimentation rate is common blood test that is used to detect and monitor inflammation in the body. The sedimentation rate is also called the erythrocyte sedimentation rate because it is a measure of the red blood cells (erythrocytes) sedimenting in a tube over a given period of time.\n\nESR is said to be a non-specific test because an elevated result often indicates the presence of inflammation but does not tell the health practitioner exactly where the inflammation is in the body or what is causing it. An ESR can be affected by other conditions besides inflammation.\n\nESR is an abbreviated form for erythrocyte sedimentation rate. It is often referred to as the sedimentation rate or the sed rate. An ESR blood test is usually done to check and understand the degree of inflammation in the body such as cancers, various kinds of infections as well as autoimmune disorders and diseases.",
+      "conversations": [
+        {
+          "question": "What does ESR stand for?",
+          "answer": "Erythrocyte sedimentation rate"
+        },
+        {
+          "question": "What is another name for the sedimentation rate test?",
+          "answer": "Sed rate"
+        },
+        {
+          "question": "How long does the sed rate test measure red blood cell settling?",
+          "answer": "One hour"
+        },
+        {
+          "question": "What type of cells are measured in the sed rate test?",
+          "answer": "Red blood cells (erythrocytes)"
+        },
+        {
+          "question": "What does a higher sed rate indicate about the body's immune system?",
+          "answer": "The greater the inflammatory response of your immune system"
+        },
+        {
+          "question": "Which condition is NOT directly diagnosed by an ESR test but may be monitored using it?",
+          "answer": "Inflammatory disease"
+        },
+        {
+          "question": "What is one reason why ESR is considered a non-specific test?",
+          "answer": "An elevated result often indicates the presence of inflammation but does not tell the health practitioner exactly where the inflammation is in the body or what is causing it"
+        },
+        {
+          "question": "What are three examples of conditions that ESR may help detect or monitor?",
+          "answer": "Cancers, various kinds of infections, and autoimmune disorders and diseases"
+        },
+        {
+          "question": "What is the primary purpose of an ESR blood test?",
+          "answer": "To check and understand the degree of inflammation in the body"
+        },
+        {
+          "question": "What is the traditional use of the ESR test?",
+          "answer": "To check for inflammation in the body"
+        },
+        {
+          "question": "What is the main idea of the context regarding the ESR test?",
+          "answer": "ESR is a blood test used to detect and monitor inflammation in the body, though it is non-specific and does not identify the exact cause or location of inflammation"
+        },
+        {
+          "question": "Why is the ESR test useful despite being non-specific?",
+          "answer": "It may help your doctor diagnose or monitor the progress of an inflammatory disease"
+        },
+        {
+          "question": "What is the significance of the distance red blood cells fall in the test tube?",
+          "answer": "The farther the red blood cells have descended, the greater the inflammatory response of your immune system"
+        },
+        {
+          "question": "What is the relationship between ESR and inflammation?",
+          "answer": "The sed rate test measures how quickly red blood cells settle in a test tube in one hour. The more red cells that fall to the bottom of the test tube in one hour, the higher the sed rate"
+        },
+        {
+          "question": "What can affect the results of an ESR test besides inflammation?",
+          "answer": "Other conditions"
+        }
+      ]
+    },
+    {
+      "query_id": 20808,
+      "context": "Osteoarthritis of the Knee. Osteoarthritis is the most common cause of musculoskeletal pain and disability in the knee joint. In the knee joint, the end of the femur (thigh bone) and tibia (shin bone) are covered in smooth articulate cartilage. Symptoms of osteoarthritis include joint pain with activity, night pain, morning stiffness, limited motion, joint inflammation, crepitus or noise from the knee, and deformity. Below are pictures of osteoarthritis in a knee joint. There are several options in treating osteoarthritis, both surgical and nonsurgical.\n\nOsteoarthritis, commonly known as wear-and-tear arthritis, is a condition in which the natural cushioning between joints -- cartilage -- wears away. When this happens, the bones of the joints rub more closely against one another with less of the shock-absorbing benefits of cartilage. 1 In fact, weak muscles around the knee can lead to osteoarthritis. 2  Other illnesse s. 3  People with rheumatoid arthritis, the second most common type of arthritis, are also more likely to develop\n\nOutcomes for most people with osteoarthritis are good. OA is the most common form of arthritis with disease of the knee and hip affecting about 3.8% of people as of 2010. Among those over 60 years old about 10% of males and 18% of females are affected. It is the cause of about 2% of years lived with disability\n\nA. Arthritis is a general term that means inflammation of the joints. Osteoarthritis, commonly known as wear and tear arthritis, is the most common type of arthritis. It is associated with a breakdown of cartilage in joints and can occur in almost any joint in the body. It commonly occurs in the weight-bearing joints of the hips, knees, and spine. \n\nIntroduction of Arthritis in the Knee. Arthritis in the knee is a condition that affects more than four million Americans annually, occurs when degenerative changes develop in the cartilage that lines the knee joint.\n\nOsteoarthritis is the most common type of arthritis. While it can occur even in young people, the chance of developing osteoarthritis rises after age 45. According to the Arthritis Foundation, more than 27 million people in the U.S. have osteoarthritis, with the knee being one of the most commonly affected areas. 1 In fact, weak muscles around the knee can lead to osteoarthritis. 2  Other illnesse s. 3  People with rheumatoid arthritis, the second most common type of arthritis, are also more likely to develop\n\nConsensus is that total knee replacement is the most clinically effective treatment for severe osteoarthritis of the knee. Unicompartmental knee replacement may be more effective in the long term than tricompartmental knee replacement. \n\nTricompartmental arthritis involves all three of the anatomical compartments of the knee joint. It can cause significant joint pain and stiffness, as well as instability; it tends to be more common in older adults, because it represents an advanced progression of disease. Surgically, one of the best options for tricompartmental arthritis can be a full knee replacement. Medical professionals typically only recommend surgery when other options are no longer viable because the joint is too degenerated, and replacing it may be the most efficient choice.\n\n1 People with rheumatoid arthritis, the second most common type of arthritis, are also more likely to develop osteoarthritis. 2  People with certain metabolic disorders, such as iron overload or excess growth hormone, also run a higher risk of osteoarthritis. 1 In fact, weak muscles around the knee can lead to osteoarthritis. 2  Other illnesse s. 3",
+      "conversations": [
+        {
+          "question": "What is the most common cause of musculoskeletal pain and disability in the knee joint?",
+          "answer": "Osteoarthritis"
+        },
+        {
+          "question": "Which two bones in the knee joint are covered in smooth articulate cartilage?",
+          "answer": "The end of the femur (thigh bone) and tibia (shin bone)"
+        },
+        {
+          "question": "What are some symptoms of osteoarthritis mentioned in the context?",
+          "answer": "Joint pain with activity, night pain, morning stiffness, limited motion, joint inflammation, crepitus or noise from the knee, and deformity"
+        },
+        {
+          "question": "What is another name for osteoarthritis mentioned in the context?",
+          "answer": "Wear-and-tear arthritis"
+        },
+        {
+          "question": "What happens when cartilage wears away in osteoarthritis?",
+          "answer": "The bones of the joints rub more closely against one another with less of the shock-absorbing benefits of cartilage"
+        },
+        {
+          "question": "Which type of arthritis is the second most common after osteoarthritis?",
+          "answer": "Rheumatoid arthritis"
+        },
+        {
+          "question": "What percentage of people were affected by osteoarthritis of the knee and hip as of 2010?",
+          "answer": "About 3.8%"
+        },
+        {
+          "question": "What percentage of males over 60 years old are affected by osteoarthritis according to the context?",
+          "answer": "About 10%"
+        },
+        {
+          "question": "What percentage of females over 60 years old are affected by osteoarthritis according to the context?",
+          "answer": "About 18%"
+        },
+        {
+          "question": "What is the most clinically effective treatment for severe osteoarthritis of the knee according to the consensus?",
+          "answer": "Total knee replacement"
+        },
+        {
+          "question": "What is the main idea of the context regarding osteoarthritis of the knee?",
+          "answer": "Osteoarthritis is the most common form of arthritis affecting the knee, characterized by cartilage breakdown, leading to pain and disability, with both nonsurgical and surgical treatments available"
+        },
+        {
+          "question": "What is the purpose of the context in discussing osteoarthritis?",
+          "answer": "To explain the causes, symptoms, prevalence, and treatment options for osteoarthritis of the knee"
+        },
+        {
+          "question": "What does the context suggest about the effectiveness of treatment for osteoarthritis?",
+          "answer": "Outcomes for most people with osteoarthritis are good"
+        },
+        {
+          "question": "Why might weak muscles around the knee contribute to osteoarthritis?",
+          "answer": "Because weak muscles can lead to osteoarthritis"
+        },
+        {
+          "question": "What is tricompartmental arthritis, and what does it affect?",
+          "answer": "Tricompartmental arthritis involves all three of the anatomical compartments of the knee joint and can cause significant joint pain and stiffness, as well as instability"
+        }
+      ]
+    },
+    {
+      "query_id": 19757,
+      "context": "The interquartile range is a value that is the difference between the upper quartile value and the lower quartile value. To find the interquartile range, simply take the upper quartile and subtract the lower quartile. To unlock this lesson you must be a Study.com Member. To find the interquartile range, simply take the upper quartile and subtract the lower quartile: 7.5 - 2.5 = 5. The interquartile range for this data set is 5. That means that the majority of the group can make about five out of ten free throw shots.\n\n1 The lower quartile (Q 1) is the median of the lower half of the data set. 2  The upper quartile (Q 3) is the median of the upper half of the data set. 3  The interquartile range (IQR) is the spread of the middle 50% of the data values. 4  So: The interquartile range is a more useful measure of spread than range as it describes the middle 50% of the data values and thus, is less affected by outliers. 19 21 24 21 24 28 25 24 30. 19 21 21 24 24 24 25 28 30. 1  The median is the middle value of the data set.\n\nThe interquartile range is a value that is the difference between the upper quartile value and the lower quartile value. Coach Taylor can use the interquartile range to summarize the overall accuracy of his players. To find the quartiles of this data set use the following steps: 1  Order the data from least to greatest. To find the interquartile range, simply take the upper quartile and subtract the lower quartile: 7.5 - 2.5 = 5. The interquartile range for this data set is 5. That means that the majority of the group can make about five out of ten free throw shots.\n\n1 The upper quartile (Q 3) is the median of the upper half of the data set. 2  The interquartile range (IQR) is the spread of the middle 50% of the data values. The interquartile range is a more useful measure of spread than range as it describes the middle 50% of the data values and thus, is less affected by outliers. 19 21 24 21 24 28 25 24 30. 19 21 21 24 24 24 25 28 30. 1  The median is the middle value of the data set.\n\nInterquartile range. The interquartile range is another range used as a measure of the spread. The difference between upper and lower quartiles (Q 3 –Q 1), which is called the interquartile range, also indicates the dispersion of a data set. The interquartile range spans 50% of a data set, and eliminates the influence of outliers because, in effect, the highest and lowest quarters are removed. Semi-quartile range. The semi-quartile range is another measure of spread. It is calculated as one half the difference between the 75th percentile (often called Q 3) and the 25th percentile (Q 1). The formula for semi-quartile range is: (Q 3 –Q 1) ÷ 2.\n\nSince half the scores in a distribution lie between Q3 and Q1, the semi-interquartile range is 1/2 the distance needed to cover 1/2 the scores. In a symmetric distribution, an interval stretching from one semi-interquartile range below the median to one semi-interquartile above the median will contain 1/2 of the scores. Next section: Variance and Standard Deviation. The semi-interquartile range is a measure of spread or dispersion. It is computed as one half the difference between the 75th percentile [often called (Q3)] and the 25th percentile (Q1). The formula for semi-interquartile range is therefore: (Q3-Q1)/2\n\nIn descriptive statistics, the interquartile range (IQR), also called the midspread or middle fifty, is a measure of statistical dispersion, being equal to the difference between the upper and lower quartiles, IQR = Q 3 − Q 1. Unlike total range, the interquartile range has a breakdown point of 50%, and is thus often preferred to the total range. The IQR is used to build box plots, simple graphical representations of a probability distribution.",
+      "conversations": [
+        {
+          "question": "What is the interquartile range (IQR) defined as in the context?",
+          "answer": "The interquartile range (IQR) is defined as the difference between the upper quartile value and the lower quartile value."
+        },
+        {
+          "question": "How is the interquartile range calculated according to the context?",
+          "answer": "To find the interquartile range, simply take the upper quartile and subtract the lower quartile."
+        },
+        {
+          "question": "What is the interquartile range for the data set mentioned in the example?",
+          "answer": "The interquartile range for this data set is 5."
+        },
+        {
+          "question": "What does the interquartile range represent in terms of data spread?",
+          "answer": "The interquartile range (IQR) is the spread of the middle 50% of the data values."
+        },
+        {
+          "question": "What is the formula for calculating the semi-quartile range?",
+          "answer": "The formula for semi-quartile range is: (Q3 – Q1) ÷ 2."
+        },
+        {
+          "question": "What is the median of the data set described in the context?",
+          "answer": "The median is the middle value of the data set."
+        },
+        {
+          "question": "What is the lower quartile (Q1) according to the context?",
+          "answer": "The lower quartile (Q1) is the median of the lower half of the data set."
+        },
+        {
+          "question": "What is the upper quartile (Q3) according to the context?",
+          "answer": "The upper quartile (Q3) is the median of the upper half of the data set."
+        },
+        {
+          "question": "Which measure of spread is less affected by outliers according to the context?",
+          "answer": "The interquartile range is less affected by outliers."
+        },
+        {
+          "question": "What does the interquartile range eliminate from consideration when measuring spread?",
+          "answer": "The interquartile range eliminates the influence of outliers because, in effect, the highest and lowest quarters are removed."
+        },
+        {
+          "question": "What is the main purpose of using the interquartile range in statistics?",
+          "answer": "The interquartile range is a more useful measure of spread than range as it describes the middle 50% of the data values and thus, is less affected by outliers."
+        },
+        {
+          "question": "How does the interquartile range relate to box plots?",
+          "answer": "The IQR is used to build box plots, simple graphical representations of a probability distribution."
+        },
+        {
+          "question": "What is another name for the interquartile range mentioned in the context?",
+          "answer": "The interquartile range is also called the midspread or middle fifty."
+        },
+        {
+          "question": "What is the breakdown point of the interquartile range?",
+          "answer": "The interquartile range has a breakdown point of 50%."
+        },
+        {
+          "question": "What does the semi-interquartile range represent in a symmetric distribution?",
+          "answer": "In a symmetric distribution, an interval stretching from one semi-interquartile range below the median to one semi-interquartile above the median will contain 1/2 of the scores."
+        }
+      ]
+    },
+    {
+      "query_id": 20898,
+      "context": "The northern snakehead fish is said to not be a threat to humans. However, a more vicious species, the giant snakeheads have reportedly attacked and even killed peo … ple who have went near its young. They have been found in Maine, California, Florida, Hawaii, Maryland, Massachusetts, and Rhode Island. \n\nDCL |. The giant snakehead, Channa micropeltes, is a nasty, nasty fish. It's a native of lakes, rivers and other bodies of freshwater in South and Southeast Asia, from India to Vietnam. \n\nIn the United States, there are four species of snakeheads: Channa argus (northern snakehead), Channa micropeltes (giant snakehead), Channa marulius (bullseye snakehead), and Channa maculate (blotched snakehead). The northern snakehead fish has succeeded in establishing breeding populations in the wild. Northern snakehead fish are strong predators at the juvenile and adult stages of their life cycle. Many native species are outcompeted for food resources. Small prey, such as zooplankton, larvae, and small fish and crustaceans populations may be threatened by feeding juvenile snakehead fish.\n\nPosted. There is a snakehead thread on the first page of this very section of the forum. Lots of snakehead discussion there already. They are being hunted for the threats they could pose and as a response to the sensationalized stories the media has created about them. I have it on good authority that in the Potomac, no snakeheads have been found with bass in their stomachs. Bass on the other hand, love to eat baby snakeheads. I'm not going to go into the whole snakeheads aren't actually that bad argument because we've beaten it to death and I would simply be restating what's already been said in other threads. Calling them dangerous is a joke, at least in regards to humans.\n\nThe snakeheads are members of the freshwater perciform fish family Channidae, native to parts of Africa and Asia. These elongated, predatory fish are distinguished by their long dorsal fins, large mouths, and shiny teeth. They breathe air with gills, which allows them to migrate short distances over land. Humans have been introducing snakeheads to nonindigenous waters for over 100 years. In parts of Asia and Africa, the snakehead is considered a valuable food fish, and is produced in aquacultures (fisheries motivation) or by ignorance (as was the case in Crofton, Maryland).\n\nBackground. The northern snakehead fish (Channa argus) has been identified as an invasive aquatic fish across the country. Snakehead fish got their name because of their long, cylindrical body plan and large scales on their head that give them a snake-like appearance. Northern snakehead fish are strong predators at the juvenile and adult stages of their life cycle. Many native species are outcompeted for food resources. Small prey, such as zooplankton, larvae, and small fish and crustaceans populations may be threatened by feeding juvenile snakehead fish.\n\nThe northern snakehead is an aggressive freshwater fish that can grow to be about 4 feet long. It has been found in a variety of freshwater lakes, swamps, ponds, and streams of various temperatures, but cannot tolerate saltwater. The northern snakehead fish is native to parts of Asia and Africa. 1 The northern snakehead fish has a large mouth with a strong jaw and sharp, canine-like teeth. 2  Its head resembles that of a snake; it has an elongated cylindrical shape with enlarged scales and eyes on each side near the top front of the head.\n\nThe northern snakehead is an invasive fish native to China, Russia and Korea. Other snakehead species are native to parts of Asia and Africa. Two populations of this air-breathing predator have been identified in New York State; one in two connected ponds in Queens, NYC and one in Ridgebury Lake in the Town of Wawayanda, Orange County. Northern Snakehead in a tank. Snakeheads are highly invasive and have the potential to disrupt recreational and commercial fishing, harm native fish and wildlife, and impact our economy. New York State prohibits possession, sale and live transport of snakehead fish (genus Channa and Parachanna) and their viable eggs.\n\nThe northern snakehead fish was first discovered in the United States in California in 1997. This species is considered established in Virginia, Maryland, Pennsylvania, New York and Arkansas. Individual fish have also been collected in California, Florida, Illinois, Massachusetts, Delaware and North Carolina. Northern snakehead fish are strong predators at the juvenile and adult stages of their life cycle. Many native species are outcompeted for food resources. Small prey, such as zooplankton, larvae, and small fish and crustaceans populations may be threatened by feeding juvenile snakehead fish.",
+      "conversations": [
+        {
+          "question": "What is the scientific name of the giant snakehead?",
+          "answer": "Channa micropeltes"
+        },
+        {
+          "question": "Where are giant snakeheads native to?",
+          "answer": "lakes, rivers and other bodies of freshwater in South and Southeast Asia, from India to Vietnam"
+        },
+        {
+          "question": "How many species of snakeheads are there in the United States?",
+          "answer": "four"
+        },
+        {
+          "question": "Which species of snakehead is known as the northern snakehead?",
+          "answer": "Channa argus"
+        },
+        {
+          "question": "In which U.S. state was the northern snakehead first discovered?",
+          "answer": "California"
+        },
+        {
+          "question": "What type of environment cannot northern snakehead fish tolerate?",
+          "answer": "saltwater"
+        },
+        {
+          "question": "What do juvenile snakehead fish feed on that threatens small prey populations?",
+          "answer": "zooplankton, larvae, and small fish and crustaceans"
+        },
+        {
+          "question": "What feature allows snakehead fish to migrate short distances over land?",
+          "answer": "They breathe air with gills"
+        },
+        {
+          "question": "Which two locations in New York State have identified populations of northern snakehead fish?",
+          "answer": "one in two connected ponds in Queens, NYC and one in Ridgebury Lake in the Town of Wawayanda, Orange County"
+        },
+        {
+          "question": "What does New York State prohibit regarding snakehead fish?",
+          "answer": "possession, sale and live transport of snakehead fish (genus Channa and Parachanna) and their viable eggs"
+        },
+        {
+          "question": "What is the main purpose of introducing snakeheads to nonindigenous waters?",
+          "answer": "for over 100 years"
+        },
+        {
+          "question": "What is the primary reason snakeheads are being hunted in the United States?",
+          "answer": "the threats they could pose"
+        },
+        {
+          "question": "What is the general consensus about the danger snakeheads pose to humans, according to the text?",
+          "answer": "Calling them dangerous is a joke, at least in regards to humans"
+        },
+        {
+          "question": "What is the main ecological concern associated with the presence of northern snakehead fish?",
+          "answer": "They are strong predators at the juvenile and adult stages of their life cycle. Many native species are outcompeted for food resources."
+        },
+        {
+          "question": "What family do snakehead fish belong to?",
+          "answer": "freshwater perciform fish family Channidae"
+        }
+      ]
+    },
+    {
+      "query_id": 20179,
+      "context": "Re: Mack Tuna: *Eating Qualities. This might be common knowledge but a good way of bleeding tuna is by taking a sharp knife and making a vertical cut just behind the pectoral fins. the blood comes rushing out if done strait away. Speak up if so as I have your gloves. We filleted a mack tuna that a &quot;matt&quot; hit at fishrock at SWR. Nice fish but when we filleted it the flesh was blood black and really didnt look inviting. We didnt bleed it so that would prob be a major factor. Befor we go out again matt can you fix your inside leg seem.\n\nNutrition. A 3-ounce serving of chunk light tuna canned in water contains 99 calories, 22 grams of protein and 0.7 grams of fat, making it a good choice for people looking for a low-fat protein source. This is 44 percent of the daily value for protein for people following a 2,000-calorie diet. \n\nAsk any bodybuilder or fitness-lover what he or she thinks of canned tuna and there's a good chance that you'll get this answer: Canned tuna is a time-saving miracle food, said with eyes full of wonder and happiness. Of course, you have to like tuna to eat canned tuna. As far as meal-in-a-can foods go, tuna is bland. \n\nRe: Mack Tuna: *Eating Qualities. Most of the time when people tell you something tastes crap, it's just them having a wank about how much they know. I was told the 3 kilo Bonito I once bought from the co-op wouldn't even impress my cat. It was beautiful. Speak up if so as I have your gloves. We filleted a mack tuna that a &quot;matt&quot; hit at fishrock at SWR. Nice fish but when we filleted it the flesh was blood black and really didnt look inviting. We didnt bleed it so that would prob be a major factor. Befor we go out again matt can you fix your inside leg seem.\n\nHaven't tried this with mack tuna, but have done it with tailor which has a similar soft oily flesh and came out pretty good. Usually eat it as a starter or snack before main meal. I usually just eyeball the ingredients, but below is an approximation for one fillet off the fish you are holding. Of course that means you have lot of leftover tuna. #Which is just perfect as snapper bait ... #8-). Last, I'm a great believer in making sure ingredients go together. #Dipping mack tuna in beer batter and deep frying it might make sense (maybe) but it's definitely not going to taste like snapper.\n\nCanned tuna is inexpensive and packed with protein. The fish is mild in flavor and versatile enough to include in a variety of nutritious recipes. Opt for tuna canned in water, and a serving contains less than 1 gram of fat and only about 100 calories. You'll also get a good dose iron and potassium as well. While you shouldn't eat tuna every day because of its mercury content, you can still safely enjoy canned tuna as a regular part of your healthy eating plan. Omega-3 Fatty Acids. The small amount of fat present in canned light tuna is mostly the healthy unsaturated kind, including omega-3 fatty acids. Omega-3 fatty acids support a healthy brain and promote proper growth and development.\n\n#That makes the meat a lot more like beef than fish. #Mack tuna are even richer than most tuna so they have a strong taste if not bled. Second, because they are such speedsters, mack tuna have lots of interior support such as tendons and blood cavities. #The only part I consider worth eating is the large muscle along the back that doesn't have any tendons in it. Of course that means you have lot of leftover tuna. #Which is just perfect as snapper bait ... #8-). Last, I'm a great believer in making sure ingredients go together. #Dipping mack tuna in beer batter and deep frying it might make sense (maybe) but it's definitely not going to taste like snapper.\n\nThe only time I have ever eaten mack tuna was at the Mackerel Islands one year when a Greek friend baked one up with garlic and vegetables – it tasted pretty good too, given that it looked so bloody and uninviting when he prepared it. Most readers will have eaten mack tuna in its canned form. Mack tuna are members of the very important family Scombridae that includes all mackerel, tuna and bonito. Size. The Australian all-tackle game fishing record stands at 11.8 kilos, taken in Queensland back in 1973. The West Australian record is a bit smaller at 8.9 kilos taken off Exmouth in 1995 by Geoff Moyle.\n\nAlthough the mack tuna schools tend to contain larger fish, the star record for striped tuna is about 2kg heavier. Mack tuna are a northern species and are most common from Carnarvon north although Kalbarri does play host to many schools quite close to shore. Those stripes on top of the back make the Mack Tuna look very much like a mackerel in the water. Striped Tuna. Striped tuna certainly look blue rather than green and have prominent horizontal stripes along the body.",
+      "conversations": [
+        {
+          "question": "What is the recommended method for bleeding a mack tuna?",
+          "answer": "Taking a sharp knife and making a vertical cut just behind the pectoral fins."
+        },
+        {
+          "question": "Where was the mack tuna caught that had blood-black flesh after filleting?",
+          "answer": "Fishrock at SWR."
+        },
+        {
+          "question": "Why did the mack tuna fillet have blood-black flesh?",
+          "answer": "We didn't bleed it so that would prob be a major factor."
+        },
+        {
+          "question": "What is the size of the Australian all-tackle game fishing record for mack tuna?",
+          "answer": "11.8 kilos."
+        },
+        {
+          "question": "Where was the West Australian mack tuna record taken?",
+          "answer": "Off Exmouth."
+        },
+        {
+          "question": "Who set the West Australian mack tuna record in 1995?",
+          "answer": "Geoff Moyle."
+        },
+        {
+          "question": "What is the fat content in a 3-ounce serving of chunk light tuna canned in water?",
+          "answer": "0.7 grams of fat."
+        },
+        {
+          "question": "How many calories are in a 3-ounce serving of chunk light tuna canned in water?",
+          "answer": "99 calories."
+        },
+        {
+          "question": "What percentage of the daily value for protein does a 3-ounce serving of canned light tuna provide on a 2,000-calorie diet?",
+          "answer": "44 percent."
+        },
+        {
+          "question": "Which part of the mack tuna is considered worth eating due to lack of tendons?",
+          "answer": "The large muscle along the back."
+        },
+        {
+          "question": "What is the main reason given for not eating mack tuna every day?",
+          "answer": "Because of its mercury content."
+        },
+        {
+          "question": "What family do mack tuna belong to?",
+          "answer": "The very important family Scombridae."
+        },
+        {
+          "question": "What is the primary benefit of omega-3 fatty acids found in canned light tuna?",
+          "answer": "Support a healthy brain and promote proper growth and development."
+        },
+        {
+          "question": "What is one suggested way to prepare mack tuna, according to the text?",
+          "answer": "Baking it with garlic and vegetables."
+        },
+        {
+          "question": "What is the general purpose of the context regarding mack tuna and canned tuna?",
+          "answer": "To discuss the eating qualities, preparation methods, nutritional benefits, and fishing records related to mack tuna and canned tuna."
+        }
+      ]
+    }
+  ]
+}
