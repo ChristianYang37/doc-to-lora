@@ -147,8 +147,25 @@ class Metanetwork(nn.Module):
         # Prefer live inner config if present; else fall back to cached copy
         return getattr(self.metamodel, "config", None)
 
-    @torch.compile # (mode="max-autotune")
-    def forward(self, input_ids, input_attention_mask, evidence_ids, evidence_attention_mask, metalora = None, labels = None, use_metanet = True, use_gradient_checkpoint = False, **kwargs) -> dict:
+    def forward(self, input_ids, input_attention_mask, evidence_ids, evidence_attention_mask, metalora=None, labels=None, use_metanet=True, use_gradient_checkpoint=False, **kwargs):
+        # doc2lora x SHINE multi-chunk path (uncompiled; the QUEST scoring uses hooks
+        # + python loops that torch.compile can't trace). Set via metanet._mc = cfg.multichunk.
+        mc = getattr(self, "_mc", None)
+        if use_metanet and mc is not None and getattr(mc, "enabled", False):
+            import multichunk as _mcmod
+            loradict = _mcmod.multichunk_lora_for_batch(
+                self, evidence_ids, evidence_attention_mask,
+                input_ids, input_attention_mask, metalora, mc)
+            outputs = self.metamodel(input_ids=input_ids, attention_mask=input_attention_mask,
+                                     loradict=loradict, labels=labels, ignore_mem_token=True,
+                                     use_gradient_checkpoint=use_gradient_checkpoint, **kwargs)
+            outputs.reg_loss = torch.zeros((), device=input_ids.device)
+            return outputs
+        return self._forward_std(input_ids, input_attention_mask, evidence_ids, evidence_attention_mask,
+                                 metalora, labels, use_metanet, use_gradient_checkpoint, **kwargs)
+
+    @torch.compile  # (mode="max-autotune")
+    def _forward_std(self, input_ids, input_attention_mask, evidence_ids, evidence_attention_mask, metalora=None, labels=None, use_metanet=True, use_gradient_checkpoint=False, **kwargs) -> dict:
         '''
         memory_states: (batch_size, num_layer, num_mem_token, hidden_size)
         '''

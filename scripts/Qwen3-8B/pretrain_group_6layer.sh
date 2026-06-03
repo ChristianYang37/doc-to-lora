@@ -28,6 +28,19 @@ NUM_LAYERS=6
 WARMUP_STEPS=200
 METHOD=rl
 
+# --- doc2lora x SHINE: query-aware + multi-chunk knobs (MULTICHUNK_ENABLED=false -> plain single-pass SHINE) ---
+MULTICHUNK_ENABLED=false
+N_SINK=4
+N_LOCAL=32
+PAGE_SIZE=64
+QUERY_AWARE_MIX=true
+MIX_TOP_K=8
+MIX_TEMP=1.0
+NORM_RULE=energy
+NORM_LAM=1.0
+VAR_RANK=true
+MC_ARGS="multichunk.enabled=$MULTICHUNK_ENABLED multichunk.n_sink=$N_SINK multichunk.n_local=$N_LOCAL multichunk.page_size=$PAGE_SIZE multichunk.query_aware_mix=$QUERY_AWARE_MIX multichunk.mix_top_k=$MIX_TOP_K multichunk.mix_temp=$MIX_TEMP multichunk.norm_rule=$NORM_RULE multichunk.norm_lam=$NORM_LAM multichunk.var_rank=$VAR_RANK"
+
 # Find available port
 while true; do
     if ! nc -z 127.0.0.1 $MASTER_PORT; then
@@ -58,6 +71,7 @@ python generate_group_idx.py  \
     metanetwork.transformer_cfg.num_layers=$NUM_LAYERS \
     optim.warmup_steps=$WARMUP_STEPS \
     metanetwork.method=$METHOD \
+    ${MC_ARGS} \
     > tmp_pretrain_$NAME.txt 2>&1
 
 wait
@@ -85,4 +99,5 @@ nohup torchrun \
     metanetwork.transformer_cfg.num_layers=$NUM_LAYERS \
     optim.warmup_steps=$WARMUP_STEPS \
     metanetwork.method=$METHOD \
+    ${MC_ARGS} \
     > tmp_pretrain_$NAME.txt 2>&1 &

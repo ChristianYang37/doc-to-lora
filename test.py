@@ -293,11 +293,18 @@ def test_and_save(
 
         loradict = None
         if use_metanet:
-            loradict = metanet.generate_lora_dict(
-                evidence_ids=evidence_ids,
-                evidence_attention_mask=evidence_attention_mask,
-                metalora=metalora,
-            )
+            _mc = getattr(cfg, "multichunk", None)
+            if _mc is not None and _mc.enabled:
+                import multichunk as _mcmod
+                loradict = _mcmod.multichunk_lora_for_batch(
+                    metanet, evidence_ids, evidence_attention_mask,
+                    input_ids, input_attention_mask, metalora, _mc)
+            else:
+                loradict = metanet.generate_lora_dict(
+                    evidence_ids=evidence_ids,
+                    evidence_attention_mask=evidence_attention_mask,
+                    metalora=metalora,
+                )
 
         gen_out = metanet.metamodel.generate(
             input_ids=input_ids,

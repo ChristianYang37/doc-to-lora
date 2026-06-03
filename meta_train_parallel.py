@@ -478,9 +478,10 @@ def main(cfg: DictConfig):
     # if is_main_process():
     #     print("NOTHING:", metamodel.get_input_embeddings().weight[nothing_id])
     metanetwork = Metanetwork(metamodel, cfg, metamodel.lora_params_numel(cfg.model.lora_r))
+    metanetwork._mc = getattr(cfg, "multichunk", None)  # doc2lora x SHINE multi-chunk (default off)
     metanetwork.train()
     metanetwork.to(device)
-    freeze(metamodel) 
+    freeze(metamodel)
     if is_main_process():
         logger.info(f"Metanetwork type: {cfg.metanetwork.type}, Transform method: {cfg.metanetwork.method}")
         

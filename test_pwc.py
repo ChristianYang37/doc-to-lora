@@ -408,7 +408,14 @@ def generate_multiturn(
         
         lora_dict = None
         if use_metanet:
-            lora_dict = metanetwork.generate_lora_dict(evidence_ids, evidence_attention_mask, metalora)
+            _mc = getattr(metanetwork, "_mc", None)  # set from cfg.multichunk before this call
+            if _mc is not None and _mc.enabled:
+                import multichunk as _mcmod
+                # multi-turn: LoRA built once from the context before the conversation -> uniform page mixing
+                lora_dict = _mcmod.multichunk_lora_for_batch(
+                    metanetwork, evidence_ids, evidence_attention_mask, None, None, metalora, _mc)
+            else:
+                lora_dict = metanetwork.generate_lora_dict(evidence_ids, evidence_attention_mask, metalora)
         
         conversation_log = [{"initial message": deepcopy(messages)}]
         f1_scores = []
@@ -881,6 +888,7 @@ def main(cfg: DictConfig):
     if is_main_process():
         logger.info(f"Resume mode, loading from {resume_dir}...")
     metanetwork, metalora, _ = load_checkpoint(metanetwork, resume_dir, device)
+    metanetwork._mc = getattr(cfg, "multichunk", None)  # doc2lora x SHINE multi-chunk (default off)
 
     # Data
     test_sources = cfg.test.source.split(",")

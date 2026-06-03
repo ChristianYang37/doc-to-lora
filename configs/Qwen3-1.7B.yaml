@@ -127,4 +127,17 @@ hydra:
 
 hidden_size: -1
 num_layers: -1
+
+# doc2lora x SHINE multi-chunk (default off -> plain single-pass SHINE)
+multichunk:
+  enabled: false
+  n_sink: 4
+  n_local: 32
+  page_size: 64
+  query_aware_mix: true
+  mix_top_k: 8
+  mix_temp: 1.0
+  norm_rule: energy       # off | energy
+  norm_lam: 1.0
+  var_rank: true
 num_mem_token: 4

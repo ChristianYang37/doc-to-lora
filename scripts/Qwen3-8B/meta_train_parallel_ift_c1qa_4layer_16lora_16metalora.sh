@@ -31,6 +31,19 @@ METHOD=rl
 LORA_R=16
 METALORA_R=16
 
+# --- doc2lora x SHINE: query-aware + multi-chunk knobs (MULTICHUNK_ENABLED=false -> plain single-pass SHINE) ---
+MULTICHUNK_ENABLED=false
+N_SINK=4
+N_LOCAL=32
+PAGE_SIZE=64
+QUERY_AWARE_MIX=true
+MIX_TOP_K=8
+MIX_TEMP=1.0
+NORM_RULE=energy
+NORM_LAM=1.0
+VAR_RANK=true
+MC_ARGS="multichunk.enabled=$MULTICHUNK_ENABLED multichunk.n_sink=$N_SINK multichunk.n_local=$N_LOCAL multichunk.page_size=$PAGE_SIZE multichunk.query_aware_mix=$QUERY_AWARE_MIX multichunk.mix_top_k=$MIX_TOP_K multichunk.mix_temp=$MIX_TEMP multichunk.norm_rule=$NORM_RULE multichunk.norm_lam=$NORM_LAM multichunk.var_rank=$VAR_RANK"
+
 # Find available port
 while true; do
     if ! nc -z 127.0.0.1 $MASTER_PORT; then
@@ -69,4 +82,5 @@ nohup torchrun \
     metanetwork.method=$METHOD \
     model.lora_r=$LORA_R \
     model.metalora_r=$METALORA_R \
+    ${MC_ARGS} \
     > tmp_metatrain_$NAME.txt 2>&1 &
