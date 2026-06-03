@@ -119,8 +119,14 @@ def _find_text_decoder(module):
 class LoraQwen35(nn.Module):
     """Hook-based LoRA metamodel around a standard Qwen3.5 text model."""
 
-    def __init__(self, text_model: nn.Module, lm_head: nn.Linear, config, num_mem_token: int):
+    def __init__(self, text_model: nn.Module, lm_head: nn.Linear, config, num_mem_token: int,
+                 lora_scope: str = "attention"):
+        """lora_scope: "attention" -> LoRA only on q/k/v/o of the full-attention layers
+        (recommended for Qwen3.5: the query-aware fusion is attention-score-based, so the
+        LoRA lives exactly where attention does). "all" -> also MLP on every layer."""
         super().__init__()
+        assert lora_scope in ("attention", "all")
+        self.lora_scope = lora_scope
         self.model = text_model
         self.lm_head = lm_head
         self.config = config
@@ -141,14 +147,15 @@ class LoraQwen35(nn.Module):
                     lin = getattr(attn, _PROJ_TO_ATTR[proj])
                     setattr(attn, _PROJ_TO_ATTR[proj], LoraLinear.from_linear(lin))
                     self.sites.append((li, "attention", proj, getattr(attn, _PROJ_TO_ATTR[proj])))
-            for proj in MLP_PROJ:
-                lin = getattr(mlp, _PROJ_TO_ATTR[proj])
-                setattr(mlp, _PROJ_TO_ATTR[proj], LoraLinear.from_linear(lin))
-                self.sites.append((li, "mlp", proj, getattr(mlp, _PROJ_TO_ATTR[proj])))
+            if self.lora_scope == "all":
+                for proj in MLP_PROJ:
+                    lin = getattr(mlp, _PROJ_TO_ATTR[proj])
+                    setattr(mlp, _PROJ_TO_ATTR[proj], LoraLinear.from_linear(lin))
+                    self.sites.append((li, "mlp", proj, getattr(mlp, _PROJ_TO_ATTR[proj])))
         self.method = "rl"
 
     @classmethod
-    def from_pretrained(cls, model_path, num_mem_token, dtype=None, **kw):
+    def from_pretrained(cls, model_path, num_mem_token, lora_scope="attention", dtype=None, **kw):
         """Load a real Qwen3.5 checkpoint and wrap its text decoder.
 
         Qwen3.5-9B is a VL model (``Qwen3_5ForConditionalGeneration``); we locate
@@ -163,7 +170,7 @@ class LoraQwen35(nn.Module):
         lm_head = full.get_output_embeddings()
         config = getattr(text, "config", getattr(full, "config", None))
         config = getattr(config, "text_config", config)  # unwrap VL config
-        return cls(text, lm_head, config, num_mem_token)
+        return cls(text, lm_head, config, num_mem_token, lora_scope=lora_scope)
 
     # ---- interface used by Metanetwork ----
     @property

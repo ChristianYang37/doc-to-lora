@@ -47,14 +47,14 @@ def main():
         n_sink=4, n_local=8, page_size=8, top_k=2, norm_rule="energy", norm_lam=1.0, var_rank=True)
 
     # combined LoRA is Lb=1 and rank-stacked over kept pages
-    down = combined[0]["mlp"]["down"]
-    assert down["A"].shape[0] == 1 and down["B"].shape[0] == 1
-    kept_rank = down["A"].shape[-1]
+    q = combined[3]["attention"]["q"]
+    assert q["A"].shape[0] == 1 and q["B"].shape[0] == 1
+    kept_rank = q["A"].shape[-1]
     assert kept_rank % r == 0
     print("ok multichunk combine: Lb=1, kept pages=%d (combined rank=%d)" % (kept_rank // r, kept_rank))
-    # layer 0 (linear-attn) has only mlp; layer 3 (full-attn) has attention too
-    assert "attention" not in combined[0] and "attention" in combined[3]
-    print("ok scoped: linear layer has mlp-only, full-attn layer has attention LoRA")
+    # attention-only scope: LoRA exists only on the full-attention layer (3), no MLP / linear layers
+    assert set(combined.keys()) == {3} and set(combined[3]) == {"attention"}
+    print("ok scoped attention-only: LoRA only on full-attn layer 3 (q/k/v/o), nowhere else")
 
     # apply the combined LoRA to a question forward + generate
     base = meta(input_ids=qids, attention_mask=qmask, loradict=None, ignore_mem_token=True).logits

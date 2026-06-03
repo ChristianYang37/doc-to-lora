@@ -1,10 +1,16 @@
 # Clean SHINE — Qwen3.5 + multi-chunk query-aware LoRA (doc2lora × SHINE)
 
-This branch is a cleaned SHINE variant with two changes:
+This branch is a cleaned SHINE variant that supports **two backbones**:
 
-1. **Backbone Qwen3 → Qwen3.5.**
-2. **doc2lora's chunking + query-aware mixing + LoRA-norm rescaling** ported into SHINE
-   (train + eval).
+- **Qwen3** — the original SHINE metamodel (`LoraQwen.py`, all-linear: q/k/v/o + gate/up/down on
+  every layer), **restored to run on transformers ≥ 5.2** (it broke on the 4.57→5.2 API churn).
+- **Qwen3.5** — a hook-based metamodel (`lora_qwen35.py`) with LoRA scoped to **attention only**
+  (q/k/v/o on the 8 full-attention layers). Qwen3.5 is hybrid (24/32 layers are GatedDeltaNet,
+  no attention); since the query-aware fusion is **attention-score-based**, the LoRA lives exactly
+  where the attention does.
+
+Plus **doc2lora's chunking + query-aware mixing + LoRA-norm rescaling** ported into SHINE
+(`query_aware.py` + `multichunk.py`).
 
 ## Why it's not a drop-in (key findings)
 
@@ -20,10 +26,11 @@ This branch is a cleaned SHINE variant with two changes:
 | file | what | verified |
 |---|---|---|
 | `query_aware.py` | chunking (`build_paged_evidence`), QUEST scoring, norm rescaling (`normalize_loradict`, `frob_norm_AB`), var-rank (`mask_loradict_to_ranks`), prune + weighted **rank-combine** (`combine_chunk_loras`) | `tests/test_query_aware.py` (6/6) |
-| `lora_qwen35.py` | hook-based LoRA metamodel for **hybrid Qwen3.5**; reproduces SHINE's interface (`lora_params_numel`/`generate_lora_dict`/`divide_idx`/memory-states via `output_hidden_states`/`generate`); **scoped LoRA** = MLP on all layers + attention on the 8 full-attn layers; `from_pretrained` extracts the text decoder from the VL model | `tests/test_lora_qwen35_smoke.py` |
+| `LoraQwen.py` | **Qwen3** metamodel (original SHINE, all-linear) restored for transformers ≥ 5.2 | `tests/test_lora_qwen3_smoke.py` |
+| `lora_qwen35.py` | hook-based LoRA metamodel for **hybrid Qwen3.5**; reproduces SHINE's interface (`lora_params_numel`/`generate_lora_dict`/`divide_idx`/memory-states via `output_hidden_states`/`generate`); **`lora_scope="attention"`** = q/k/v/o on the 8 full-attn layers only (`"all"` adds MLP); `from_pretrained` extracts the text decoder from the VL model | `tests/test_lora_qwen35_smoke.py` |
 | `multichunk.py` | end-to-end path: page → per-page LoRA → var-rank → rescale → **GQA-aware QUEST** weights → prune → combine → one LoRA | `tests/test_multichunk_smoke.py` |
 
-Run all: `python tests/test_query_aware.py && python tests/test_lora_qwen35_smoke.py && python tests/test_multichunk_smoke.py`
+Run all: `for t in test_query_aware test_lora_qwen3_smoke test_lora_qwen35_smoke test_multichunk_smoke; do python tests/$t.py; done`
 
 ## Config
 
@@ -34,8 +41,9 @@ are the knobs.
 
 ## Design notes / decisions
 
-- **Scoped LoRA, uniform-friendly:** per-layer LoRA layout is kept uniform-compatible; attention
-  LoRA is *applied* only on the 8 full-attention layers (the GatedDeltaNet layers get MLP LoRA).
+- **Qwen3 (all-linear) vs Qwen3.5 (attention-only):** Qwen3 has attention in every layer, so the
+  original all-linear LoRA + the attention-score fusion fit naturally. Qwen3.5 is hybrid, so LoRA is
+  scoped to q/k/v/o of the 8 full-attention layers — the only layers the QUEST fusion can read.
 - **Rescaling target:** `‖A@B‖_F = lam·√(r_page)·σ_max(W0)` per page/layer/proj (energy / stable-rank).
 - **Variable rank:** `r_page = #page-tokens`, capped at `lora_r` (nested truncation).
 - **Combine:** weighted rank-stack so `A@B = Σ_c w_c A_c B_c` (QUEST top-k softmax weights, sink/local force-kept).

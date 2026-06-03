@@ -39,13 +39,13 @@ def main():
     cfg, meta = build()
     r, scale, B = 2, 0.001, 2
 
-    # 1) site discovery: MLP on all 4 layers, attention only on layer 3
-    n_mlp = sum(1 for *_, in meta.sites if _[1] == "mlp")
+    # 1) site discovery: attention-only -> q/k/v/o on the full-attention layer (layer 3) only
+    n_mlp = sum(1 for s in meta.sites if s[1] == "mlp")
     n_attn = sum(1 for s in meta.sites if s[1] == "attention")
-    assert meta.full_attn_layers == [3], meta.full_attn_layers
-    assert n_mlp == 4 * 3 and n_attn == 1 * 4, (n_mlp, n_attn)
-    print("ok sites: %d total (mlp=%d all-layers, attn=%d full-attn-only); full_attn_layers=%s"
-          % (len(meta.sites), n_mlp, n_attn, meta.full_attn_layers))
+    assert meta.lora_scope == "attention" and meta.full_attn_layers == [3], meta.full_attn_layers
+    assert n_attn == 1 * 4 and n_mlp == 0, (n_attn, n_mlp)
+    print("ok sites: %d total (attention-only: q/k/v/o on full-attn layers); full_attn_layers=%s"
+          % (len(meta.sites), meta.full_attn_layers))
 
     # 2) param layout + generate_lora_dict shapes (derive dims from the real Linears)
     site_io = {(li, g, p): (lin.in_features, lin.out_features) for li, g, p, lin in meta.sites}

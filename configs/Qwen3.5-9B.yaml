@@ -37,9 +37,12 @@ model:
   metalora_r: 8
   ift_additional_metalora_r: -1
   num_mem_token: ${num_mem_token}
-  # NEW: hook-based Qwen3.5 metamodel (replaces LoraQwen.LoraQwen3ForCausalLM).
-  # Loaded as: LoraQwen35.from_pretrained(model_path, num_mem_token=...).
+  # NEW: hook-based Qwen3.5 metamodel (Qwen3 still uses the original LoraQwen.py).
+  # Loaded as: LoraQwen35.from_pretrained(model_path, num_mem_token=..., lora_scope=...).
   metamodel_class_path: "lora_qwen35.LoraQwen35"
+  # Qwen3.5 is hybrid: only 8/32 layers have attention. The query-aware fusion is
+  # attention-score-based, so LoRA is scoped to q/k/v/o of those full-attention layers.
+  lora_scope: "attention"   # "attention" (q/k/v/o on full-attn layers) | "all" (+ MLP everywhere)
   tokenizer_from: "${paths.model_path}"
   model_from: "${paths.model_path}"
   # Qwen3.5 thinking mode: SHINE answers are short; disable thinking at chat-template time.

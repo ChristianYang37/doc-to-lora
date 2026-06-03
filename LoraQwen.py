@@ -25,7 +25,19 @@ import torch.nn.functional as F
 import torch
 from torch import nn
 from torch import Tensor
-from transformers.models.qwen3.modeling_qwen3 import ACT2FN, Cache, DynamicCache, GenerationMixin, use_kernel_forward_from_hub, create_causal_mask, create_sliding_window_causal_mask, FlashAttentionKwargs, GenericForQuestionAnswering, GenericForSequenceClassification, GenericForTokenClassification, GradientCheckpointingLayer, BaseModelOutputWithPast, CausalLMOutputWithPast, ROPE_INIT_FUNCTIONS, dynamic_rope_update, ALL_ATTENTION_FUNCTIONS, PreTrainedModel, Unpack, TransformersKwargs, auto_docstring, can_return_tuple, deprecate_kwarg, check_model_inputs, Qwen3Config, Qwen3RMSNorm, Qwen3MLP, Qwen3Attention, apply_rotary_pos_emb, eager_attention_forward, Qwen3RotaryEmbedding
+from transformers.models.qwen3.modeling_qwen3 import ACT2FN, Cache, DynamicCache, GenerationMixin, use_kernel_forward_from_hub, create_causal_mask, create_sliding_window_causal_mask, FlashAttentionKwargs, GenericForQuestionAnswering, GenericForSequenceClassification, GenericForTokenClassification, GradientCheckpointingLayer, BaseModelOutputWithPast, CausalLMOutputWithPast, ROPE_INIT_FUNCTIONS, dynamic_rope_update, ALL_ATTENTION_FUNCTIONS, PreTrainedModel, Unpack, TransformersKwargs, auto_docstring, can_return_tuple, Qwen3Config, Qwen3RMSNorm, Qwen3MLP, Qwen3Attention, apply_rotary_pos_emb, eager_attention_forward, Qwen3RotaryEmbedding
+# transformers>=5.x compat: deprecate_kwarg moved; check_model_inputs was removed.
+# SHINE collects memory_states manually inside the forward, so a no-op shim is safe.
+try:
+    from transformers.utils.deprecation import deprecate_kwarg
+except Exception:  # pragma: no cover
+    def deprecate_kwarg(*a, **k):
+        return lambda f: f
+try:
+    from transformers.utils.generic import check_model_inputs
+except Exception:
+    def check_model_inputs(f):
+        return f
 from math import sqrt
 from torch.utils.checkpoint import checkpoint
 from torch import Tensor
@@ -642,7 +654,7 @@ class LoraQwen3Model(Qwen3PreTrainedModel):
             # Prepare mask arguments
             mask_kwargs = {
                 "config": self.config,
-                "input_embeds": inputs_embeds,
+                "inputs_embeds": inputs_embeds,  # transformers>=5.x renamed input_embeds
                 "attention_mask": attention_mask,
                 "cache_position": cache_position,
                 "past_key_values": past_key_values,
