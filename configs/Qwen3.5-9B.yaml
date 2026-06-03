@@ -1,0 +1,73 @@
+# Clean SHINE config for Qwen3.5-9B (hybrid GatedDeltaNet + full-attention, VL backbone).
+# The metamodel is the hook-based wrapper in lora_qwen35.py (not LoraQwen.py), which
+# loads the standard Qwen3.5 text decoder and injects scoped LoRA via hooks.
+name: default
+mode: train
+resume_global_step: -1
+
+run:
+  seed: 42
+  use_amp: false
+  gradient_accumulation_steps: 4
+  device: cuda
+  use_gradient_checkpoint: false
+
+paths:
+  model_path: "./models/Qwen3.5-9B"   # download: modelscope download --model Qwen/Qwen3.5-9B
+  output_dir: "qwen35-finetuned"
+
+data:
+  context_max_length: 1024
+  conversation_max_length: 1024
+  train_batch_size: 1
+  eval_batch_size: 1
+  num_workers: 4
+  source: squad
+
+optim:
+  learning_rate: 0.00005
+  weight_decay: 0.01
+  adapter_reg: 0.0
+  num_epochs: 1
+  warmup_steps: 2000
+  grad_clip_norm: 1.0
+
+model:
+  lora_r: 8
+  metalora_r: 8
+  ift_additional_metalora_r: -1
+  num_mem_token: ${num_mem_token}
+  # NEW: hook-based Qwen3.5 metamodel (replaces LoraQwen.LoraQwen3ForCausalLM).
+  # Loaded as: LoraQwen35.from_pretrained(model_path, num_mem_token=...).
+  metamodel_class_path: "lora_qwen35.LoraQwen35"
+  tokenizer_from: "${paths.model_path}"
+  model_from: "${paths.model_path}"
+  # Qwen3.5 thinking mode: SHINE answers are short; disable thinking at chat-template time.
+  disable_thinking: true
+
+metanetwork:
+  type: "transformer"
+  method: "rl"
+  transformer_cfg:
+    encoder_cfg: {d_model: 4096, nhead: 32, dim_feedforward: 8192, dropout: 0, activation: gelu,
+                  layer_norm_eps: 0.00001, batch_first: True, norm_first: False, bias: True}
+    couple_encoder_cfg: {d_model: 4096, nhead: 32, dim_feedforward: 8192, dropout: 0, activation: gelu,
+                         layer_norm_eps: 0.00001, batch_first: True, norm_first: False, bias: True}
+    layer_transformer_first: True
+    mean_pool_size: 1
+    num_layers: 4
+    couple_num_layers: 0
+    scale: 0.001
+
+# NEW: doc2lora x SHINE multi-chunk path (default off -> plain single-pass SHINE).
+multichunk:
+  enabled: false          # split context into QUEST pages, one LoRA per page, then combine
+  n_sink: 4               # attention-sink tokens kept as one page
+  n_local: 32             # recent/local tokens kept as one page
+  page_size: 64           # middle page size in tokens
+  query_aware_mix: true   # QUEST top-k softmax weighting of pages (uses full-attn q/k)
+  mix_top_k: 8
+  mix_temp: 1.0
+  norm_rule: "energy"     # off | energy  (rescale ||A@B||_F = lam*sqrt(r_page)*sigma_max(W0))
+  norm_lam: 1.0
+  var_rank: true          # per-page rank = page token count (nested truncation, capped at lora_r)
