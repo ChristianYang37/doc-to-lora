@@ -220,3 +220,35 @@ def multichunk_lora_for_batch(metanet, evidence_ids, evidence_mask, query_ids, q
             top_k=mc.mix_top_k, temperature=mc.mix_temp, query_aware_mix=mc.query_aware_mix,
             norm_rule=mc.norm_rule, norm_lam=mc.norm_lam, var_rank=mc.var_rank))
     return _stack_loradicts(per_sample)
+
+
+# --------------------------------------------------------------------------- #
+# merge a generated LoRA back into the base model weights (export a standalone model)
+# --------------------------------------------------------------------------- #
+@torch.no_grad()
+def merge_loradict_into_model(metamodel, loradict, idx: int = 0):
+    """Bake a single generated LoRA (batch index ``idx``) into the model weights IN PLACE.
+
+    SHINE applies LoRA additively at forward (``LoraLinear.forward``: ``out = base + (x@A)@B + C``,
+    with ``A:[in,r]``, ``B:[r,out]``). Since ``F.linear`` computes ``x @ W.T``, the equivalent
+    merged weight is::
+
+        W <- W + (A @ B).T          # [out,in] += ([in,r]@[r,out]).T
+        bias <- bias + C            # if the layer has a bias
+
+    SHINE's ``scale`` is already folded into ``A,B,C`` at generation, so no extra factor is needed.
+    Works for both metamodels (LoraQwen3 / LoraQwen35) and for the multi-chunk combined loradict.
+    After merging, run the model WITHOUT a loradict. ``copy.deepcopy(metamodel)`` first if you want
+    to keep the un-merged base.
+    """
+    layers = _decoder_layers(metamodel)
+    for li, group, proj, leaf in qa.iter_leaves(loradict):
+        mod = layers[li].self_attn if group == "attention" else layers[li].mlp
+        lin = getattr(mod, f"{proj}_proj")
+        A = leaf["A"][idx].to(lin.weight.dtype)   # [in, r]
+        B = leaf["B"][idx].to(lin.weight.dtype)   # [r, out]
+        lin.weight.data += (A @ B).t()            # [out, in]
+        C = leaf.get("C")
+        if C is not None and getattr(lin, "bias", None) is not None:
+            lin.bias.data += C[idx].to(lin.bias.dtype)
+    return metamodel

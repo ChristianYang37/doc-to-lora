@@ -74,6 +74,15 @@ def run(name, meta, mem, r=8, scale=0.01, full_attn_layers=None):
     assert leaf["A"].shape[0] == 1 and leaf["A"].shape[-1] % r == 0
     print("ok %-7s multichunk: combined layers=%s, kept pages=%d" % (
         name, sorted(combined.keys()), leaf["A"].shape[-1] // r))
+    # merge the combined LoRA back into the model weights -> standalone model
+    import copy
+    with torch.no_grad():
+        applied = meta(input_ids=qids, attention_mask=qmask, loradict=combined, ignore_mem_token=True).logits
+        m2 = copy.deepcopy(meta)
+        mc.merge_loradict_into_model(m2, combined, idx=0)
+        merged_out = m2(input_ids=qids, attention_mask=qmask, loradict=None, ignore_mem_token=True).logits
+    assert torch.allclose(applied, merged_out, atol=1e-3), (applied - merged_out).abs().max()
+    print("ok %-7s merge_loradict_into_model: merged-weights == LoRA-applied" % name)
     # training path: gradients flow back through the metanetwork
     metanet.lin.weight.grad = None
     leaf["A"].float().sum().backward()
