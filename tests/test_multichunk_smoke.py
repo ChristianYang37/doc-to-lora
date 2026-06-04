@@ -88,6 +88,16 @@ def run(name, meta, mem, r=8, scale=0.01, full_attn_layers=None):
     leaf["A"].float().sum().backward()
     assert metanet.lin.weight.grad is not None, "no grad to metanetwork (training broken)"
     print("ok %-7s grad flows to metanetwork (training-capable)" % name)
+    # mix_rescale: fixed post-softmax scalar -> combined LoRA scales linearly
+    with torch.no_grad():
+        kw = dict(n_sink=4, n_local=8, page_size=8, top_k=2, query_aware_mix=True, norm_rule="energy", var_rank=True)
+        c1 = mc.generate_lora_dict_multichunk(metanet, ctx, qids, qmask, metalora, mix_rescale=1.0, **kw)
+        c3 = mc.generate_lora_dict_multichunk(metanet, ctx, qids, qmask, metalora, mix_rescale=3.0, **kw)
+        li = next(iter(c1)); g = next(iter(c1[li])); p = next(iter(c1[li][g]))
+        d1 = (c1[li][g][p]["A"][0] @ c1[li][g][p]["B"][0]).norm()
+        d3 = (c3[li][g][p]["A"][0] @ c3[li][g][p]["B"][0]).norm()
+    assert torch.allclose(d3, 3.0 * d1, rtol=1e-3), (d1.item(), d3.item())
+    print("ok %-7s mix_rescale: combined ||A@B|| 1x->3x (%.3f -> %.3f)" % (name, d1.item(), d3.item()))
     # batched helper (B=2), ragged ranks padded
     class MC:  # cfg.multichunk stand-in
         enabled = True; n_sink = 4; n_local = 8; page_size = 8; query_aware_mix = True

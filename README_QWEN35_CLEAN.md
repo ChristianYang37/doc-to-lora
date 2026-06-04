@@ -37,8 +37,9 @@ Run all: `for t in test_query_aware test_lora_qwen3_smoke test_lora_qwen35_smoke
 Every config (`configs/Qwen3-8B.yaml`, `Qwen3-1.7B`, `Qwen3-0.6B`, `Qwen3.5-9B`) carries a
 `multichunk:` block (default **off** → plain single-pass SHINE). Set `multichunk.enabled: true`
 for the doc2lora × SHINE path; knobs: `n_sink`, `n_local`, `page_size`, `query_aware_mix`,
-`mix_top_k`, `mix_temp`, `norm_rule` (`off`|`energy`), `norm_lam`, `var_rank` (+ `model.lora_scope`
-for Qwen3.5). The entrypoints (`test.py`/`test_pwc.py`/`test_pretrain.py`/`meta_train_parallel.py`)
+`mix_top_k`, `mix_temp`, `norm_rule` (`off`|`energy`), `norm_lam`, `var_rank`, `mix_rescale` (a fixed
+scalar multiplied onto the combined LoRA *after* the softmax mix; default `1.0` = no-op) (+
+`model.lora_scope` for Qwen3.5). The entrypoints (`test.py`/`test_pwc.py`/`test_pretrain.py`/`meta_train_parallel.py`)
 read `cfg.multichunk` at their `generate_lora_dict` sites and branch to `multichunk.
 multichunk_lora_for_batch` when enabled.
 

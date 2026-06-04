@@ -126,7 +126,8 @@ def quest_page_weights(metamodel, query_ids, query_mask, full_ctx_ids, full_ctx_
 def generate_lora_dict_multichunk(
     metanet, context_tokens: list[int], query_ids, query_mask, metalora, *,
     n_sink=4, n_local=32, page_size=64, top_k=None, temperature=1.0,
-    query_aware_mix=True, norm_rule="off", norm_lam=1.0, var_rank=False, sigma_cache=None,
+    query_aware_mix=True, norm_rule="off", norm_lam=1.0, var_rank=False,
+    mix_rescale=1.0, sigma_cache=None,
 ):
     """One combined ``loradict`` (Lb=1) for a single context+query, via SHINE's
     ``Metanetwork`` (works for both the Qwen3 and Qwen3.5 metamodels).
@@ -167,6 +168,7 @@ def generate_lora_dict_multichunk(
     loradict = qa.select_pages(loradict, idx)
     w = weights[idx]
     w = w / w.sum().clamp_min(1e-6)
+    w = w * float(mix_rescale)   # fixed post-softmax rescale of the combined LoRA (default 1.0 = no-op)
     return qa.combine_chunk_loras(loradict, w)
 
 
@@ -218,7 +220,8 @@ def multichunk_lora_for_batch(metanet, evidence_ids, evidence_mask, query_ids, q
             metanet, ctx, qi, qm, metalora,
             n_sink=mc.n_sink, n_local=mc.n_local, page_size=mc.page_size,
             top_k=mc.mix_top_k, temperature=mc.mix_temp, query_aware_mix=mc.query_aware_mix,
-            norm_rule=mc.norm_rule, norm_lam=mc.norm_lam, var_rank=mc.var_rank))
+            norm_rule=mc.norm_rule, norm_lam=mc.norm_lam, var_rank=mc.var_rank,
+            mix_rescale=getattr(mc, "mix_rescale", 1.0)))
     return _stack_loradicts(per_sample)
 
 

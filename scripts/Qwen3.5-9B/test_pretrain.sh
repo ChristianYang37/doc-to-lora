@@ -35,8 +35,9 @@ MIX_TEMP=1.0
 NORM_RULE=energy
 NORM_LAM=1.0
 VAR_RANK=true
+MIX_RESCALE=1.0
 LORA_SCOPE=attention   # attention (q/k/v/o on full-attn layers) | all
-MC_ARGS="model.lora_scope=$LORA_SCOPE multichunk.enabled=$MULTICHUNK_ENABLED multichunk.n_sink=$N_SINK multichunk.n_local=$N_LOCAL multichunk.page_size=$PAGE_SIZE multichunk.query_aware_mix=$QUERY_AWARE_MIX multichunk.mix_top_k=$MIX_TOP_K multichunk.mix_temp=$MIX_TEMP multichunk.norm_rule=$NORM_RULE multichunk.norm_lam=$NORM_LAM multichunk.var_rank=$VAR_RANK"
+MC_ARGS="model.lora_scope=$LORA_SCOPE multichunk.enabled=$MULTICHUNK_ENABLED multichunk.n_sink=$N_SINK multichunk.n_local=$N_LOCAL multichunk.page_size=$PAGE_SIZE multichunk.query_aware_mix=$QUERY_AWARE_MIX multichunk.mix_top_k=$MIX_TOP_K multichunk.mix_temp=$MIX_TEMP multichunk.norm_rule=$NORM_RULE multichunk.norm_lam=$NORM_LAM multichunk.var_rank=$VAR_RANK multichunk.mix_rescale=$MIX_RESCALE"
 
 # Find available port
 while true; do

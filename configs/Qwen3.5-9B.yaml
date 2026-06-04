@@ -74,3 +74,4 @@ multichunk:
   norm_rule: "energy"     # off | energy  (rescale ||A@B||_F = lam*sqrt(r_page)*sigma_max(W0))
   norm_lam: 1.0
   var_rank: true          # per-page rank = page token count (nested truncation, capped at lora_r)
+  mix_rescale: 1.0        # fixed scalar multiplied onto the combined LoRA AFTER the softmax mix

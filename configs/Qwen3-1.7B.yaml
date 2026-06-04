@@ -140,4 +140,5 @@ multichunk:
   norm_rule: energy       # off | energy
   norm_lam: 1.0
   var_rank: true
+  mix_rescale: 1.0        # fixed scalar multiplied onto the combined LoRA AFTER the softmax mix
 num_mem_token: 4
