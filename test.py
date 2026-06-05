@@ -420,6 +420,8 @@ def test_and_save(
 
 @hydra.main(version_base=None, config_path="configs")
 def main(cfg: DictConfig):
+    import lora_ortho
+    lora_ortho.ENABLED = bool(getattr(cfg, "lora_ortho_update", True))
     # ========= DDP init (safe for single-process) =========
     ddp_init_if_needed()
 

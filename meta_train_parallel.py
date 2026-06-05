@@ -417,6 +417,8 @@ def evaluate(metanetwork_ddp_or_module, dataloader, device, use_amp: bool = Fals
 
 @hydra.main(version_base=None, config_path="configs")
 def main(cfg: DictConfig):
+    import lora_ortho
+    lora_ortho.ENABLED = bool(getattr(cfg, "lora_ortho_update", True))
     amp_dtype = torch.bfloat16
     
     torch.set_float32_matmul_precision('high')

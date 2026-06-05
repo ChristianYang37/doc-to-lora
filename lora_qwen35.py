@@ -27,6 +27,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch import Tensor
 
+import lora_ortho
+
 ATTN_PROJ = ("q", "k", "v", "o")
 MLP_PROJ = ("gate", "up", "down")
 _PROJ_TO_ATTR = {"q": "q_proj", "k": "k_proj", "v": "v_proj", "o": "o_proj",
@@ -64,7 +66,11 @@ class LoraLinear(nn.Linear):
         out = torch.matmul(torch.matmul(x, A[:, None]), B[:, None])  # [Lb,beams,S,out]
         if C is not None:
             out = out + C[:, None, None, :]
-        return base + out.reshape(*input.shape[:-1], self.out_features)
+        lora_out = out.reshape(*input.shape[:-1], self.out_features)
+        if lora_ortho.ENABLED:
+            return lora_ortho.apply_forward(base, lora_out, A, B, self.weight, self.bias,
+                                            Lb, num_beams, self.out_features, input.shape)
+        return base + lora_out
 
     # --- SHINE leaf contract ---
     def lora_params_numel(self, r):

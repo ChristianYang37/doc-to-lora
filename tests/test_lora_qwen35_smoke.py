@@ -2,9 +2,10 @@
 Builds a TINY hybrid Qwen3.5 text model (random weights) and exercises the
 SHINE metamodel interface end-to-end on CPU. Run: python tests/test_lora_qwen35_smoke.py
 """
-import importlib.util, os, torch
+import importlib.util, os, sys, torch
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(_HERE, ".."))   # so lora_qwen35's `import lora_ortho` resolves
 spec = importlib.util.spec_from_file_location("lora_qwen35", os.path.join(_HERE, "..", "lora_qwen35.py"))
 lq = importlib.util.module_from_spec(spec); spec.loader.exec_module(lq)
 

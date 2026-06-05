@@ -17,6 +17,7 @@ import torch
 import torch.nn as nn
 
 import query_aware as qa
+import lora_ortho
 
 
 # --------------------------------------------------------------------------- #
@@ -127,7 +128,7 @@ def generate_lora_dict_multichunk(
     metanet, context_tokens: list[int], query_ids, query_mask, metalora, *,
     n_sink=4, n_local=32, page_size=64, top_k=None, temperature=1.0,
     query_aware_mix=True, norm_rule="off", norm_lam=1.0, var_rank=False,
-    mix_rescale=1.0, sigma_cache=None,
+    mix_rescale=1.0, ortho_combine=False, sigma_cache=None,
 ):
     """One combined ``loradict`` (Lb=1) for a single context+query, via SHINE's
     ``Metanetwork`` (works for both the Qwen3 and Qwen3.5 metamodels).
@@ -169,7 +170,7 @@ def generate_lora_dict_multichunk(
     w = weights[idx]
     w = w / w.sum().clamp_min(1e-6)
     w = w * float(mix_rescale)   # fixed post-softmax rescale of the combined LoRA (default 1.0 = no-op)
-    return qa.combine_chunk_loras(loradict, w)
+    return qa.combine_chunk_loras(loradict, w, ortho=ortho_combine)
 
 
 # --------------------------------------------------------------------------- #
@@ -221,7 +222,8 @@ def multichunk_lora_for_batch(metanet, evidence_ids, evidence_mask, query_ids, q
             n_sink=mc.n_sink, n_local=mc.n_local, page_size=mc.page_size,
             top_k=mc.mix_top_k, temperature=mc.mix_temp, query_aware_mix=mc.query_aware_mix,
             norm_rule=mc.norm_rule, norm_lam=mc.norm_lam, var_rank=mc.var_rank,
-            mix_rescale=getattr(mc, "mix_rescale", 1.0)))
+            mix_rescale=getattr(mc, "mix_rescale", 1.0),
+            ortho_combine=getattr(mc, "ortho_combine", False)))
     return _stack_loradicts(per_sample)
 
 
@@ -250,7 +252,11 @@ def merge_loradict_into_model(metamodel, loradict, idx: int = 0):
         lin = getattr(mod, f"{proj}_proj")
         A = leaf["A"][idx].to(lin.weight.dtype)   # [in, r]
         B = leaf["B"][idx].to(lin.weight.dtype)   # [r, out]
-        lin.weight.data += (A @ B).t()            # [out, in]
+        if lora_ortho.ENABLED:
+            a = lora_ortho.ortho_alpha(A, B, lin.weight).to(lin.weight.dtype)   # scalar
+            lin.weight.data.mul_(1 - a).add_((A @ B).t())   # W <- (1-alpha)*W + (A@B)^T
+        else:
+            lin.weight.data += (A @ B).t()        # [out, in]
         C = leaf.get("C")
         if C is not None and getattr(lin, "bias", None) is not None:
             lin.bias.data += C[idx].to(lin.bias.dtype)

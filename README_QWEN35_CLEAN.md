@@ -38,8 +38,9 @@ Every config (`configs/Qwen3-8B.yaml`, `Qwen3-1.7B`, `Qwen3-0.6B`, `Qwen3.5-9B`)
 `multichunk:` block (default **off** → plain single-pass SHINE). Set `multichunk.enabled: true`
 for the doc2lora × SHINE path; knobs: `n_sink`, `n_local`, `page_size`, `query_aware_mix`,
 `mix_top_k`, `mix_temp`, `norm_rule` (`off`|`energy`), `norm_lam`, `var_rank`, `mix_rescale` (a fixed
-scalar multiplied onto the combined LoRA *after* the softmax mix; default `1.0` = no-op) (+
-`model.lora_scope` for Qwen3.5). The entrypoints (`test.py`/`test_pwc.py`/`test_pretrain.py`/`meta_train_parallel.py`)
+scalar multiplied onto the combined LoRA *after* the softmax mix; default `1.0` = no-op),
+`multichunk.ortho_combine` (combine-level page orthogonalization; default ON) (+ `model.lora_scope`
+for Qwen3.5). Plus a top-level `lora_ortho_update` (forward/merge orthogonal trick; default ON). The entrypoints (`test.py`/`test_pwc.py`/`test_pretrain.py`/`meta_train_parallel.py`)
 read `cfg.multichunk` at their `generate_lora_dict` sites and branch to `multichunk.
 multichunk_lora_for_batch` when enabled.
 
@@ -55,6 +56,9 @@ multichunk_lora_for_batch` when enabled.
 - **Rescaling target:** `‖A@B‖_F = lam·√(r_page)·σ_max(W0)` per page/layer/proj (energy / stable-rank).
 - **Variable rank:** `r_page = #page-tokens`, capped at `lora_r` (nested truncation).
 - **Combine:** weighted rank-stack so `A@B = Σ_c w_c A_c B_c` (QUEST top-k softmax weights, sink/local force-kept).
+- **Orthogonal LoRA update (arXiv 2505.11881, `lora_ortho.py`):** add only the part of `A@B` ⟂ `W`.
+  - *Forward / merge* (`lora_ortho_update`, default ON): `out = (1−α)·x@Wᵀ + (x@A)@B + C`, `α = ⟨A@B,Wᵀ⟩_F/(‖W‖_F²+ε)` via `trace(B@W@A)` (no `A@B`, fp32, differentiable). Applies to all LoRA (metalora + generated, both metamodels) and to merge `W←(1−α)·W+(A@B)ᵀ`.
+  - *Combine* (`multichunk.ortho_combine`, default ON): sequential orthogonalization of pages — weight first, then for each page (descending weight) `αᵢ=⟨page,Σprev⟩_F/‖Σprev‖_F²` and scale all already-added pages by `(1−αᵢ)` (open-loop), then rank-stack. Near-orthogonal pages → coef≈1 → identical to the plain weighted concat.
 - `transformers >= 5.2.0` (first version shipping the `qwen3_5` architecture; the project's pin must be bumped from SHINE's `4.57.1`).
 
 ## Multi-chunk on both backbones

@@ -41,6 +41,7 @@ except Exception:
 from math import sqrt
 from torch.utils.checkpoint import checkpoint
 from torch import Tensor
+import lora_ortho
 
 class LoraLinear(nn.Linear):
     def __init__(self, in_features, out_features, bias=True, device=None, dtype=None):
@@ -78,6 +79,10 @@ class LoraLinear(nn.Linear):
 
         # Restore original middle dims: [Lb*beams, ..., out]
         lora_out = lora_out.reshape(*input.shape[:-1], self.out_features)
+        if lora_ortho.ENABLED:
+            # (1-alpha)*x@W^T + lora_out (+ bias): add only the part of A@B orthogonal to W
+            return lora_ortho.apply_forward(base, lora_out, A, B, self.weight, self.bias,
+                                            Lb, num_beams, self.out_features, input.shape)
         # try:
         #     lora_out = lora_out.reshape(*input.shape[:-1], self.out_features)
         # except RuntimeError:

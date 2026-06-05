@@ -171,12 +171,44 @@ def paged_scores_from_keys(keys: Tensor, q_mean: Tensor,
 # --------------------------------------------------------------------------- #
 # (4) combine pages into one LoRA (weighted rank-stack) + pruning
 # --------------------------------------------------------------------------- #
-def combine_chunk_loras(loradict: dict, weights: Tensor) -> dict:
-    """Combine ``Lb`` per-page LoRAs into a single (Lb=1) LoRA by weighted
-    rank-stacking: ``A=[in, Σr]``, ``B=[Σr, out]`` so ``A@B = Σ_c w_c A_c B_c``;
-    ``C = Σ_c w_c C_c``.  ``weights``: ``[Lb]`` (sums to 1 over kept pages)."""
+def _ortho_coef(Aw: Tensor, Bw: Tensor, order: Tensor, eps: float = 1e-8) -> Tensor:
+    """Per-chunk A-scaling coefficients for the sequential orthogonal merge (one leaf).
+
+    Open-loop: ``delta_W`` accumulates the ORIGINAL (weighted) updates and drives every
+    ``alpha``; the ``(1-alpha)`` factors are tracked separately and do NOT feed back. At
+    step i (chunks taken in ``order``): ``alpha_i = <Aw_i@Bw_i, delta_W>_F / (||delta_W||_F^2
+    + eps)``, then scale ALL already-processed chunks' coef by ``(1-alpha_i)`` (= scale
+    delta_W). Returns coef ``[n]`` (differentiable). ``Aw``:[n,in,r], ``Bw``:[n,r,out]."""
+    n, din = Aw.shape[0], Aw.shape[1]
+    dout = Bw.shape[-1]
+    delta_W = Aw.new_zeros(din, dout, dtype=torch.float32)
+    coef = [Aw.new_ones(()) for _ in range(n)]
+    processed: list[int] = []
+    for pos in range(n):
+        j = int(order[pos])
+        if processed:
+            num = torch.einsum("ik,ij,kj->", Aw[j].float(), delta_W, Bw[j].float())  # <Aw_j@Bw_j, delta_W>_F
+            a = (num / ((delta_W * delta_W).sum() + eps)).to(Aw.dtype)
+            for jj in processed:
+                coef[jj] = coef[jj] * (1 - a)
+        delta_W = delta_W + (Aw[j].float() @ Bw[j].float())  # original weighted update
+        processed.append(j)
+    return torch.stack(coef)  # [n]
+
+
+def combine_chunk_loras(loradict: dict, weights: Tensor, ortho: bool = False,
+                        order: Tensor | None = None, eps: float = 1e-8) -> dict:
+    """Combine ``Lb`` per-page LoRAs into a single (Lb=1) LoRA by weighted rank-stacking:
+    ``A=[in, Σr]``, ``B=[Σr, out]`` so ``A@B = Σ_c w_c A_c B_c``; ``C = Σ_c w_c C_c``.
+
+    ``ortho`` (doc2lora x SHINE orthogonal merge): after weighting, sequentially
+    orthogonalize the per-page updates against a running ``delta_W`` (descending-weight
+    ``order``), scaling each chunk's A by its accumulated ``(1-alpha)`` factor before the
+    rank-stack. Near-orthogonal chunks → coef≈1 → identical to the plain weighted concat."""
     w = weights.clamp_min(0)
     sw = w.sqrt()
+    if ortho and order is None:
+        order = torch.argsort(weights, descending=True)
     out: dict = {}
     for layer_idx, groups in loradict.items():
         out[layer_idx] = {}
@@ -186,8 +218,10 @@ def combine_chunk_loras(loradict: dict, weights: Tensor) -> dict:
                 A, B = leaf["A"], leaf["B"]  # [Lb,in,r], [Lb,r,out]
                 Lb, din, r = A.shape
                 dout = B.shape[-1]
-                A_s = A * sw[:, None, None]
+                A_s = A * sw[:, None, None]  # weight FIRST
                 B_s = B * sw[:, None, None]
+                if ortho and Lb > 1:
+                    A_s = A_s * _ortho_coef(A_s, B_s, order, eps)[:, None, None]
                 # stack pages along rank -> [1, in, Lb*r] and [1, Lb*r, out]
                 A_c = A_s.permute(1, 0, 2).reshape(din, Lb * r)[None]
                 B_c = B_s.reshape(Lb * r, dout)[None]

@@ -129,6 +129,8 @@ hidden_size: -1
 num_layers: -1
 
 # doc2lora x SHINE multi-chunk (default off -> plain single-pass SHINE)
+lora_ortho_update: true   # orthogonal LoRA update (1-alpha)*x@W vs base W; default ON
+
 multichunk:
   enabled: false          # split context into QUEST pages, one LoRA per page, then combine
   n_sink: 4               # attention-sink tokens kept as one page
@@ -141,4 +143,5 @@ multichunk:
   norm_lam: 1.0
   var_rank: true          # per-page rank = page token count (capped at lora_r)
   mix_rescale: 1.0        # fixed scalar multiplied onto the combined LoRA AFTER the softmax mix
+  ortho_combine: true     # combine-level sequential orthogonalization of pages; default ON
 num_mem_token: 4
