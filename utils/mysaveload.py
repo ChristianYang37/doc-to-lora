@@ -10,15 +10,24 @@ from utils.myfreeze import freeze
 from torch.utils.data import DataLoader
 import time
 from utils.myloradict import freeze_loradict
+from utils.peft_lora import (
+    load_saved_adapter_if_present,
+    save_peft_adapter_if_present,
+    unwrap_peft_model,
+)
 
 logger = get_logger("save & load")
 
 def save_checkpoint(metanetwork, out_dir: str, metalora: Any, ift_additional_metalora: Any = None, extra_state: Dict[str, Any] = None):
     os.makedirs(out_dir, exist_ok=True)
-    if metanetwork.metamodel.model.use_mem_token:
-        torch.save(metanetwork.metamodel.model.mem_tokens, os.path.join(out_dir, "mem_tokens.pt"))
-    torch.save(metanetwork.metanetwork.state_dict(), os.path.join(out_dir, "metanetwork.pth"))
+    base_metamodel = unwrap_peft_model(metanetwork.metamodel)
+    base_m2p = unwrap_peft_model(metanetwork.metanetwork)
+    if base_metamodel.model.use_mem_token:
+        torch.save(base_metamodel.model.mem_tokens, os.path.join(out_dir, "mem_tokens.pt"))
+    torch.save(base_m2p.state_dict(), os.path.join(out_dir, "metanetwork.pth"))
     torch.save(metalora, os.path.join(out_dir, "metalora.pth"))
+    save_peft_adapter_if_present(metanetwork.metamodel, os.path.join(out_dir, "qwen_peft"))
+    save_peft_adapter_if_present(metanetwork.metanetwork, os.path.join(out_dir, "m2p_peft"))
     if ift_additional_metalora is not None:
         torch.save(ift_additional_metalora, os.path.join(out_dir, "ift_additional_metalora.pth"))
     if extra_state is not None:
@@ -27,11 +36,15 @@ def save_checkpoint(metanetwork, out_dir: str, metalora: Any, ift_additional_met
 
 def load_checkpoint(metanetwork, in_dir, device: str, load_ift_additional_metalora: bool = False, zero_ift_additional_metalora: bool = False):
     metanetwork.to("cpu")
-    if metanetwork.metamodel.model.use_mem_token:
+    base_metamodel = unwrap_peft_model(metanetwork.metamodel)
+    base_m2p = unwrap_peft_model(metanetwork.metanetwork)
+    if base_metamodel.model.use_mem_token:
         saved_mem_tokens = torch.load(os.path.join(in_dir, "mem_tokens.pt"), map_location="cpu", weights_only=False)
-        assert saved_mem_tokens.shape == metanetwork.metamodel.model.mem_tokens.shape, f"Shape mismatch for mem_tokens: saved {saved_mem_tokens.shape}, model {metanetwork.metamodel.model.mem_tokens.shape}"
-        metanetwork.metamodel.model.mem_tokens = saved_mem_tokens
-    metanetwork.metanetwork.load_state_dict(torch.load(os.path.join(in_dir, "metanetwork.pth"), weights_only=False, map_location="cpu"))
+        assert saved_mem_tokens.shape == base_metamodel.model.mem_tokens.shape, f"Shape mismatch for mem_tokens: saved {saved_mem_tokens.shape}, model {base_metamodel.model.mem_tokens.shape}"
+        base_metamodel.model.mem_tokens = saved_mem_tokens
+    base_m2p.load_state_dict(torch.load(os.path.join(in_dir, "metanetwork.pth"), weights_only=False, map_location="cpu"))
+    load_saved_adapter_if_present(metanetwork.metamodel, os.path.join(in_dir, "qwen_peft"))
+    load_saved_adapter_if_present(metanetwork.metanetwork, os.path.join(in_dir, "m2p_peft"))
     metalora = torch.load(os.path.join(in_dir, "metalora.pth"), map_location="cpu", weights_only=False)
     metanetwork.to(device)
     metalora = move_to_device_and_change_into_leaf(metalora, device)
