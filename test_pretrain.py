@@ -67,6 +67,7 @@ from utils.myddp import (
     barrier,
 )
 from utils.myinit import _resolve_device, _import_class
+from utils.peft_lora import apply_lora_to_m2p, apply_lora_to_qwen, peft_section_enabled
 import re
 from collections import OrderedDict, Counter
 from utils.mydebug import debug_print_ids
@@ -678,10 +679,17 @@ def main(cfg: DictConfig):
     metamodel = MetaModelCls.from_pretrained(cfg.model.model_from, config=config)
     metamodel.reset_mem_tokens()
     metamodel.resize_token_embeddings(len(tokenizer))
+    use_qwen_peft = peft_section_enabled(cfg, "qwen")
+    use_m2p_peft = peft_section_enabled(cfg, "m2p")
+    if use_qwen_peft:
+        metamodel = apply_lora_to_qwen(metamodel, cfg.peft.qwen, is_trainable=True)
     metanetwork = Metanetwork(metamodel, cfg, metamodel.lora_params_numel(cfg.model.lora_r))
+    if use_m2p_peft:
+        metanetwork.metanetwork = apply_lora_to_m2p(metanetwork.metanetwork, cfg.peft.m2p)
     metanetwork.train()
     metanetwork.to(device)
-    freeze(metamodel)
+    if not use_qwen_peft:
+        freeze(metamodel)
 
     # Training loop scaffolding
     hydra_run_dir = os.getcwd()

@@ -70,6 +70,12 @@ from utils.myddp import (
 )
 from utils.myloradict import iter_learnable_tensors, merge_loradicts, freeze_loradict, loradict_all_requires_grad
 from utils.myinit import _resolve_device, _import_class
+from utils.peft_lora import (
+    apply_lora_to_m2p,
+    apply_lora_to_qwen,
+    peft_section_enabled,
+    print_named_modules,
+)
 from collections import OrderedDict
 from typing import Optional, Union, Mapping, Sequence
 
@@ -473,6 +479,12 @@ def main(cfg: DictConfig):
     metamodel = MetaModelCls.from_pretrained(cfg.model.model_from, config=config)
     metamodel.reset_mem_tokens()
     metamodel.resize_token_embeddings(len(tokenizer))
+    use_qwen_peft = peft_section_enabled(cfg, "qwen")
+    use_m2p_peft = peft_section_enabled(cfg, "m2p")
+    if use_qwen_peft:
+        if is_main_process():
+            logger.info("Applying PEFT LoRA to Qwen metamodel.")
+        metamodel = apply_lora_to_qwen(metamodel, cfg.peft.qwen, is_trainable=True)
     
     # nothing_id = tokenizer.convert_tokens_to_ids("<NOTHING>")
     # with torch.no_grad():
@@ -481,9 +493,19 @@ def main(cfg: DictConfig):
     #     print("NOTHING:", metamodel.get_input_embeddings().weight[nothing_id])
     metanetwork = Metanetwork(metamodel, cfg, metamodel.lora_params_numel(cfg.model.lora_r))
     metanetwork._mc = getattr(cfg, "multichunk", None)  # doc2lora x SHINE multi-chunk (default off)
+    if use_m2p_peft:
+        if is_main_process():
+            print_named_modules(metanetwork.metanetwork, logger=logger)
+            logger.info("Applying PEFT LoRA to pretrained M2P/metanetwork.")
+        metanetwork.metanetwork = apply_lora_to_m2p(
+            metanetwork.metanetwork,
+            cfg.peft.m2p,
+            logger=logger if is_main_process() else None,
+        )
     metanetwork.train()
     metanetwork.to(device)
-    freeze(metamodel)
+    if not use_qwen_peft:
+        freeze(metamodel)
     if is_main_process():
         logger.info(f"Metanetwork type: {cfg.metanetwork.type}, Transform method: {cfg.metanetwork.method}")
         
@@ -581,13 +603,32 @@ def main(cfg: DictConfig):
     if is_main_process():
         logger.info("Setting up optimizer & scheduler...")
     no_decay = ["bias", "LayerNorm.weight", "layer_norm.weight", "norm.weight", "norm1", "norm2"]
+
+    def is_metamodel_param(name: str) -> bool:
+        return name.startswith("module.metamodel") or name.startswith("metamodel")
+
+    def is_trainable_named_param(name: str, param: torch.nn.Parameter) -> bool:
+        if not param.requires_grad:
+            return False
+        if not is_metamodel_param(name):
+            return True
+        return use_qwen_peft and "lora_" in name
+
     grouped_params = [
         {
-            "params": [p for n, p in ddp_metanet.named_parameters() if (not any(nd in n for nd in no_decay) and not n.startswith("module.metamodel"))],
+            "params": [
+                p
+                for n, p in ddp_metanet.named_parameters()
+                if is_trainable_named_param(n, p) and not any(nd in n for nd in no_decay)
+            ],
             "weight_decay": cfg.optim.weight_decay,
         },
         {
-            "params": [p for n, p in ddp_metanet.named_parameters() if (any(nd in n for nd in no_decay) and not n.startswith("module.metamodel"))],
+            "params": [
+                p
+                for n, p in ddp_metanet.named_parameters()
+                if is_trainable_named_param(n, p) and any(nd in n for nd in no_decay)
+            ],
             "weight_decay": 0.0,
         },
         {
