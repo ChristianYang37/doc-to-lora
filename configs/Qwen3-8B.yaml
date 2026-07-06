@@ -153,12 +153,15 @@ lora_ortho_update: true   # orthogonal LoRA update (1-alpha)*x@W vs base W; defa
 
 multichunk:
   enabled: false          # split context into QUEST pages, one LoRA per page, then combine
+  fusion_mode: static     # static | dynamic; dynamic routes chunk LoRAs per layer with softmax(q@k)
   n_sink: 4               # attention-sink tokens kept as one page
   n_local: 32             # recent/local tokens kept as one page
   page_size: 64           # middle page size (tokens)
   query_aware_mix: true   # QUEST top-k softmax weighting of pages (uses full-attn q/k)
   mix_top_k: 8
   mix_temp: 1.0
+  dynamic_top_k: 0        # 0/negative/None -> softmax over all valid chunks
+  dynamic_temp: 1.0
   norm_rule: energy       # off | energy  (rescale ||A@B||_F = lam*sqrt(r_page)*sigma_max(W0))
   norm_lam: 1.0
   var_rank: true          # per-page rank = page token count (capped at lora_r)

@@ -39,6 +39,8 @@ def iter_leaves(loradict: dict):
     have no ``"attention"`` group under scoped LoRA).
     """
     for layer_idx, groups in loradict.items():
+        if not isinstance(layer_idx, int) or not isinstance(groups, dict):
+            continue
         for group in PROJ_GROUPS:
             if group not in groups:
                 continue
@@ -143,7 +145,7 @@ def topk_softmax_weights(scores: Tensor, top_k=None, temperature: float = 1.0,
             thr = scores.topk(k, dim=-1).values[..., -1, None]
             masked = scores.masked_fill(scores < thr, float("-inf"))
         return torch.softmax(masked / max(temperature, 1e-6), dim=-1)
-    force_keep = force_keep.to(torch.bool).expand_as(scores)
+    force_keep = force_keep.to(device=scores.device, dtype=torch.bool).expand_as(scores)
     keep = force_keep.clone()
     if k < n:
         cand = scores.masked_fill(force_keep, float("-inf"))

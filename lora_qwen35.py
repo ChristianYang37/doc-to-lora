@@ -28,6 +28,7 @@ import torch.nn.functional as F
 from torch import Tensor
 
 import lora_ortho
+import lora_fusion
 
 ATTN_PROJ = ("q", "k", "v", "o")
 MLP_PROJ = ("gate", "up", "down")
@@ -59,6 +60,8 @@ class LoraLinear(nn.Linear):
         lora = self._active
         if lora is None:
             return base
+        if lora_fusion.is_dynamic_leaf(lora):
+            return lora_fusion.apply_dynamic_lora(input, base, lora)
         A, B, C = lora["A"], lora["B"], lora.get("C", None)
         Lb = A.shape[0]
         num_beams = input.shape[0] // Lb
@@ -220,9 +223,12 @@ class LoraQwen35(nn.Module):
 
     # ---- LoRA routing ----
     def _apply_loradict(self, loradict):
+        fusion_caches = {} if lora_fusion.is_dynamic_loradict(loradict) else None
         for li, group, proj, lin in self.sites:
             leaf = None
-            if loradict is not None and li in loradict and group in loradict[li] and proj in loradict[li][group]:
+            if fusion_caches is not None:
+                leaf = lora_fusion.get_leaf_loradict(loradict, li, group, proj, fusion_caches)
+            elif loradict is not None and li in loradict and group in loradict[li] and proj in loradict[li][group]:
                 leaf = loradict[li][group][proj]
             lin._active = leaf
 

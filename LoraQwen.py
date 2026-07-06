@@ -42,6 +42,7 @@ from math import sqrt
 from torch.utils.checkpoint import checkpoint
 from torch import Tensor
 import lora_ortho
+import lora_fusion
 
 class LoraLinear(nn.Linear):
     def __init__(self, in_features, out_features, bias=True, device=None, dtype=None):
@@ -51,6 +52,8 @@ class LoraLinear(nn.Linear):
         base = F.linear(input, self.weight, self.bias)
         if lora_dict is None:
             return base
+        if lora_fusion.is_dynamic_leaf(lora_dict):
+            return lora_fusion.apply_dynamic_lora(input, base, lora_dict)
 
         A = lora_dict["A"]              # [Lb, in, r]
         B = lora_dict["B"]              # [Lb, r, out]
@@ -692,7 +695,7 @@ class LoraQwen3Model(Qwen3PreTrainedModel):
                     use_cache=use_cache,
                     cache_position=cache_position,
                     position_embeddings=position_embeddings,
-                    loradict=loradict[i] if isinstance(loradict, dict) else None,
+                    loradict=lora_fusion.get_layer_loradict(loradict, i) if isinstance(loradict, dict) else None,
                     **kwargs,
                     use_reentrant=False)
             else:
@@ -704,7 +707,7 @@ class LoraQwen3Model(Qwen3PreTrainedModel):
                     use_cache=use_cache,
                     cache_position=cache_position,
                     position_embeddings=position_embeddings,
-                    loradict=loradict[i] if isinstance(loradict, dict) else None,
+                    loradict=lora_fusion.get_layer_loradict(loradict, i) if isinstance(loradict, dict) else None,
                     **kwargs,
                 )
             if self.use_mem_token and not ignore_mem_token:

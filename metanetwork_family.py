@@ -178,11 +178,40 @@ class Metanetwork(nn.Module):
             outputs = self.metamodel(input_ids=input_ids, attention_mask=input_attention_mask, labels=labels, ignore_mem_token=True, use_gradient_checkpoint=use_gradient_checkpoint, **kwargs)
         return outputs
     
-    def generate_lora_dict(self, evidence_ids, evidence_attention_mask, metalora, use_gradient_checkpoint = False, return_plain = False) -> dict:
+    def generate_fusion_keys(self, plain_output: torch.Tensor) -> torch.Tensor:
+        """Pool M2P output into one routing key per decoder layer and chunk.
+
+        The key is parameter-free for checkpoint compatibility: LoRA parameters and
+        routing keys both come from the same M2P plain output, but old checkpoints
+        can still load without adding new state dict entries.
+        """
+        num_layers = int(getattr(self.config, "num_hidden_layers", 0) or getattr(self, "num_layers", 0))
+        hidden_size = int(getattr(self.config, "hidden_size", 0) or getattr(self, "hidden_size", 0))
+        if num_layers <= 0 or hidden_size <= 0:
+            raise RuntimeError("Cannot infer num_layers/hidden_size for dynamic LoRA fusion keys")
+        if plain_output.shape[-1] % num_layers != 0:
+            raise RuntimeError(
+                f"M2P output dim {plain_output.shape[-1]} is not divisible by num_layers {num_layers}"
+            )
+        per_layer = plain_output.view(plain_output.shape[0], num_layers, -1)
+        if per_layer.shape[-1] == hidden_size:
+            return per_layer
+        pooled = F.adaptive_avg_pool1d(
+            per_layer.reshape(plain_output.shape[0] * num_layers, 1, -1),
+            hidden_size,
+        ).squeeze(1)
+        return pooled.view(plain_output.shape[0], num_layers, hidden_size).to(dtype=plain_output.dtype)
+
+    def generate_lora_dict(self, evidence_ids, evidence_attention_mask, metalora, use_gradient_checkpoint = False, return_plain = False, return_fusion_keys = False) -> dict:
         outputs = self.metamodel(input_ids=evidence_ids, attention_mask=evidence_attention_mask, loradict=metalora, use_gradient_checkpoint=use_gradient_checkpoint)
         memory_states = outputs.memory_states
         plain_output = self.metanetwork(memory_states)  # (batch_size, output_dim)
         loradict = self.metamodel.generate_lora_dict(self.lora_r, scale=self.scale, plain_tensor=plain_output)
+        if return_fusion_keys:
+            fusion_keys = self.generate_fusion_keys(plain_output)
+            if return_plain:
+                return loradict, plain_output, fusion_keys
+            return loradict, fusion_keys
         return loradict if not return_plain else (loradict, plain_output)
     
     

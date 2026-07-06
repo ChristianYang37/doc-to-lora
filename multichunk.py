@@ -18,6 +18,7 @@ import torch.nn as nn
 
 import query_aware as qa
 import lora_ortho
+import lora_fusion
 
 
 # --------------------------------------------------------------------------- #
@@ -108,7 +109,7 @@ def quest_page_weights(metamodel, query_ids, query_mask, full_ctx_ids, full_ctx_
     qcap, layers = _capture_qk(metamodel, query_ids, query_mask)
     kcap, _ = _capture_qk(metamodel, full_ctx_ids, full_ctx_mask)
     qm = query_mask[0][:, None].float()
-    total = torch.zeros(len(page_ranges))
+    total = torch.zeros(len(page_ranges), device=query_ids.device)
     for li in layers:
         q = qcap[("q", li)][0].float()                 # [Qseq, n_q*hd]
         k = kcap[("k", li)][0].float()                 # [Tseq, n_kv*hd]
@@ -137,8 +138,13 @@ def generate_lora_dict_multichunk(
     training gradients must flow through the per-page LoRA generation + combine
     (only the QUEST scoring is detached, inside ``quest_page_weights``)."""
     metamodel = metanet.metamodel
-    lora_r = metanet.lora_r
-    dev = query_ids.device
+    if query_ids is not None:
+        dev = query_ids.device
+    else:
+        try:
+            dev = next(metanet.parameters()).device
+        except StopIteration:
+            dev = torch.device("cpu")
     pad_id = getattr(metamodel.config, "pad_token_id", 0) or 0
     paged = qa.build_paged_evidence([context_tokens], n_sink, n_local, page_size, pad_id=pad_id)
     ev_ids = paged["evidence_ids"].to(dev)
@@ -163,7 +169,7 @@ def generate_lora_dict_multichunk(
             top_k=top_k, temperature=temperature)
     else:  # uniform mix over all pages (no query available)
         n = ranks.numel()
-        weights, keep = torch.full((n,), 1.0 / n, device=dev), torch.ones(n, dtype=torch.bool)
+        weights, keep = torch.full((n,), 1.0 / n, device=dev), torch.ones(n, dtype=torch.bool, device=dev)
 
     idx = keep.nonzero(as_tuple=True)[0]
     loradict = qa.select_pages(loradict, idx)
@@ -171,6 +177,45 @@ def generate_lora_dict_multichunk(
     w = w / w.sum().clamp_min(1e-6)
     w = w * float(mix_rescale)   # fixed post-softmax rescale of the combined LoRA (default 1.0 = no-op)
     return qa.combine_chunk_loras(loradict, w, ortho=ortho_combine)
+
+
+def generate_lora_dict_multichunk_dynamic(
+    metanet, context_tokens: list[int], metalora, *,
+    n_sink=4, n_local=32, page_size=64, norm_rule="off", norm_lam=1.0,
+    var_rank=False, sigma_cache=None,
+):
+    """Return per-page LoRAs plus M2P-generated routing keys for one sample.
+
+    Unlike ``generate_lora_dict_multichunk`` this does not pre-combine chunks.
+    The decoder layer will compute ``softmax(q @ k)`` weights at forward time.
+    """
+    metamodel = metanet.metamodel
+    pad_id = getattr(metamodel.config, "pad_token_id", 0) or 0
+    paged = qa.build_paged_evidence([context_tokens], n_sink, n_local, page_size, pad_id=pad_id)
+    ev_ids = paged["evidence_ids"]
+    ev_mask = paged["evidence_attention_mask"]
+    try:
+        dev = next(metanet.parameters()).device
+    except StopIteration:
+        dev = ev_ids.device
+    ev_ids = ev_ids.to(dev)
+    ev_mask = ev_mask.to(dev)
+    ranks = paged["chunk_ranks"]
+
+    loradict, fusion_keys = metanet.generate_lora_dict(
+        ev_ids,
+        ev_mask,
+        metalora,
+        return_fusion_keys=True,
+    )
+
+    if var_rank:
+        loradict = qa.mask_loradict_to_ranks(loradict, ranks.to(dev))
+    if norm_rule != "off":
+        if sigma_cache is None:
+            sigma_cache = build_sigma_cache(metamodel, loradict)
+        loradict = qa.normalize_loradict(loradict, per_chunk_targets(sigma_cache, ranks.to(dev), norm_lam))
+    return loradict, fusion_keys
 
 
 # --------------------------------------------------------------------------- #
@@ -202,6 +247,73 @@ def _stack_loradicts(dicts: list[dict]) -> dict:
     return out
 
 
+def _pad_dynamic_loradicts(dicts: list[dict], fusion_keys: list[torch.Tensor], *,
+                           temperature=1.0, top_k=None, mix_rescale=1.0) -> dict:
+    """Pad ragged per-sample chunk LoRAs into dynamic-fusion batch tensors."""
+    B = len(dicts)
+    max_chunks = max(next(iter(qa.iter_leaves(d)))[3]["A"].shape[0] for d in dicts)
+    out: dict = {}
+    for li in dicts[0].keys():
+        out[li] = {}
+        for group in dicts[0][li]:
+            out[li][group] = {}
+            for proj in dicts[0][li][group]:
+                As = [d[li][group][proj]["A"] for d in dicts]
+                Bs = [d[li][group][proj]["B"] for d in dicts]
+                Cs = [d[li][group][proj].get("C") for d in dicts]
+                din, r = As[0].shape[1], As[0].shape[2]
+                dout = Bs[0].shape[-1]
+                A = As[0].new_zeros(B, max_chunks, din, r)
+                Bmat = Bs[0].new_zeros(B, max_chunks, r, dout)
+                Cmat = None if Cs[0] is None else Cs[0].new_zeros(B, max_chunks, dout)
+                for i, (a, b) in enumerate(zip(As, Bs)):
+                    n = a.shape[0]
+                    A[i, :n] = a
+                    Bmat[i, :n] = b
+                    if Cmat is not None:
+                        Cmat[i, :n] = Cs[i]
+                leaf = {"A": A, "B": Bmat}
+                if Cmat is not None:
+                    leaf["C"] = Cmat
+                out[li][group][proj] = leaf
+
+    num_layers, hidden = fusion_keys[0].shape[1], fusion_keys[0].shape[2]
+    keys = fusion_keys[0].new_zeros(B, num_layers, max_chunks, hidden)
+    mask = torch.zeros(B, max_chunks, dtype=torch.bool, device=fusion_keys[0].device)
+    for i, k in enumerate(fusion_keys):
+        n = k.shape[0]
+        keys[i, :, :n] = k.transpose(0, 1)
+        mask[i, :n] = True
+    return lora_fusion.make_dynamic_loradict(
+        out,
+        keys,
+        mask,
+        temperature=temperature,
+        top_k=top_k,
+        mix_rescale=mix_rescale,
+    )
+
+
+def multichunk_dynamic_lora_for_batch(metanet, evidence_ids, evidence_mask, metalora, mc):
+    B = evidence_ids.shape[0]
+    per_sample, per_keys = [], []
+    for i in range(B):
+        ctx = evidence_ids[i][evidence_mask[i].bool()].tolist()
+        loradict, keys = generate_lora_dict_multichunk_dynamic(
+            metanet, ctx, metalora,
+            n_sink=mc.n_sink, n_local=mc.n_local, page_size=mc.page_size,
+            norm_rule=mc.norm_rule, norm_lam=mc.norm_lam, var_rank=mc.var_rank)
+        per_sample.append(loradict)
+        per_keys.append(keys)
+    return _pad_dynamic_loradicts(
+        per_sample,
+        per_keys,
+        temperature=getattr(mc, "dynamic_temp", getattr(mc, "mix_temp", 1.0)),
+        top_k=getattr(mc, "dynamic_top_k", None),
+        mix_rescale=getattr(mc, "mix_rescale", 1.0),
+    )
+
+
 def multichunk_lora_for_batch(metanet, evidence_ids, evidence_mask, query_ids, query_mask, metalora, mc):
     """Drop-in replacement for ``metanet.generate_lora_dict`` when ``mc.enabled``.
     Pages each sample's context, runs the multi-chunk path, returns a stacked Lb=B
@@ -209,6 +321,10 @@ def multichunk_lora_for_batch(metanet, evidence_ids, evidence_mask, query_ids, q
     reconstruction / before a multi-turn conversation).  ``mc`` is ``cfg.multichunk``
     (enabled/n_sink/n_local/page_size/query_aware_mix/mix_top_k/mix_temp/norm_rule/
     norm_lam/var_rank).  Not no_grad: grad flows in training (eval callers are no_grad)."""
+    fusion_mode = str(getattr(mc, "fusion_mode", "static")).lower()
+    if fusion_mode == "dynamic":
+        return multichunk_dynamic_lora_for_batch(metanet, evidence_ids, evidence_mask, metalora, mc)
+
     B = evidence_ids.shape[0]
     if query_ids is not None and query_mask is None:
         query_mask = torch.ones_like(query_ids)
